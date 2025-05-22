@@ -1,0 +1,102 @@
+import { Diagnostic, SourceFile, ts } from "ts-morph";
+import { SymbolReference } from "../types/symbol-ast-types";
+import { asSymbolReference, getSymbolDependencies } from "./symbols";
+import { isTsDiagnostic } from "src/type-guards";
+import { isString } from "inferred-types";
+import { getProject } from "./project";
+import { FileDiagnostic, SymbolImport } from "../types/file-ast-types";
+
+
+
+const determineIfExternal = (s: string): boolean => {
+    return s.startsWith(".") || s.startsWith("src/") || s.startsWith("/")
+        ? false
+        : true
+}
+
+/**
+ * Provides a list of symbols for the provided file
+ */
+export const getImportsForFile = (file: SourceFile): SymbolImport[] => {
+    const importDeclarations = file.getImportDeclarations();
+    const imported: SymbolImport[] = [];
+
+    importDeclarations.map(iDecl => {
+
+        // named imports
+        iDecl.getNamedImports().map(namedImport => {
+            const symbol = namedImport.getSymbol();
+            const alias = namedImport.getAliasNode()?.getText() || namedImport.getName();
+            if (symbol) {
+                imported.push(
+                    {
+                        symbol: asSymbolReference(symbol),
+                        as: alias,
+                        source: iDecl.getModuleSpecifierValue(),
+                        exportKind: "named",
+                        isExternalSource: determineIfExternal(iDecl.getModuleSpecifierValue())
+                    } as SymbolImport
+                );
+            }
+        });
+
+        // default import
+        if (iDecl.getDefaultImport()) {
+            const defaultSymbol = iDecl.getDefaultImport()?.getSymbol();
+            const alias = iDecl.getDefaultImport()?.getText();
+            if (defaultSymbol && alias) {
+                imported.push({
+                    symbol: asSymbolReference(defaultSymbol),
+                    as: alias,
+                    source: iDecl.getModuleSpecifierValue(),
+                    exportKind: "default",
+                    isExternalSource: determineIfExternal(iDecl.getModuleSpecifierValue())
+                });
+            }
+        }
+
+    });
+
+    return imported;
+}
+
+
+/**
+ * **getSymbolsDefinedInFile**`(file, [imports])`
+ * 
+ * Given a `SourceFile`, will report on both _exported_ and _local_ symbols
+ * defined in the file while _excluding_ any files which were imported
+ * but not defined here.
+ * 
+ * **Note:** providing _imports_ is not required -- they will be inferred automatically
+ * -- but if you already have them then you can pass them in as a mild
+ * performance boost.
+ */
+export const getSymbolsDefinedInFile = (
+    file: SourceFile,
+    imports?: SymbolImport[]
+): SymbolReference[] => {
+    const imported = imports?.map(i => i.symbol.fqn) || getImportsForFile(file).map(i => i.symbol.fqn);
+    const exported = file.getExportSymbols();
+    const local = exported.flatMap(s => getSymbolDependencies(s).filter(i => i.scope === "local"))
+
+    return [
+        ...exported.map(i => asSymbolReference(i)),
+        ...local.map(i => asSymbolReference(i))
+            .filter(i => i.kind !== "property") // cuts down on noise
+            .filter(i => !imported.includes(i.fqn)) // avoid imported symbols
+    ];
+}
+
+/**
+ * gets all the diagnostics for a given file.
+ */
+export const getFileDiagnostics = (
+    file: string | SourceFile
+): FileDiagnostic[] => {
+    const fileSource = isString(file)
+        ? getProject().addSourceFileAtPath(file)
+        : file;
+
+    return fileSource.getPreEmitDiagnostics().map(d => asFileDiagnostic(d));
+}
