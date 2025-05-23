@@ -8,7 +8,7 @@ import {
     getSymbolsJSDocInfo,
     getSymbolGenerics,
     createFullyQualifiedNameForSymbol
-} from "./symbols";
+} from "./asSymbolsMeta";
 import { JsDocInfo } from "~/types/symbol-ast-types";
 import { FunctionMeta, FunctionParameter, FunctionReturn } from "~/types/FunctionMeta";
 import { SymbolScope } from "~/types/general";
@@ -90,7 +90,11 @@ export function asFunctionMeta<S extends SymbolScope = SymbolScope>(
         name: sym.getName(),
         fqn: createFullyQualifiedNameForSymbol(sym),
         scope,
-        externalSource: (scope === "external" ? externalSource : undefined) as FunctionMeta<S>["externalSource"],
+        externalSource: (
+            scope === "external" 
+                ? externalSource 
+                : undefined
+        ) as FunctionMeta<S>["externalSource"],
         filepath,
         startLine,
         endLine,

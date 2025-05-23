@@ -21,3 +21,8 @@ export const NotFunction = createKindError(
     "NotFunction",
     { library: "@yankeeinlondon/reaper" }
 )
+
+export const MissingFeature = createKindError(
+    "MissingFeature",
+    { library: "@yankeeinlondon/reaper" }
+)

@@ -1,5 +1,5 @@
 import { Dictionary, ExpandDictionary } from "inferred-types";
-import { SymbolMeta } from "src/ast";
+import { symbolsMeta } from "src/ast";
 
 
 export type WithHash<T extends Dictionary> = ExpandDictionary<
@@ -30,4 +30,4 @@ export type LocalSymbol = `local::${number}::${string}`;
  * 
  * **Related:** `isLocalSymbol()`, `createLocalSymbol()`
  */
-export type SymbolLookup = Map<string, SymbolMeta>
+export type SymbolLookup = Map<string, symbolsMeta>

@@ -37,7 +37,7 @@ export type SymbolReference = {
 }
 
 /**
- * **SymbolMeta**
+ * **symbolsMeta**
  * 
  * Key meta-data for a `Symbol` which is serializable
  * (unlike a **ts-morph** `Symbol`).
@@ -46,7 +46,7 @@ export type SymbolReference = {
  * contain all relevant data on Symbols that this plugin would
  * want to report on.
  */
-export type SymbolMeta<
+export type SymbolsMeta<
     TKind extends SymbolKind = SymbolKind
 > = {
     /** symbol name */
@@ -130,34 +130,6 @@ export type SymbolMeta<
 
     toJSON(): string;
     toString(): string;
-}
-
-/**
- * **SymbolMetaWithDeps**
- * 
- * Extends the `SymbolMeta` with bi-directional view of direct dependencies:
- * 
- *   - `dependsOn` - direct dependencies of this symbol
- *   - `usedBy` - other symbols which depend on this symbol
- * 
- * All references are _full-qualified names_ for the symbol
- */
-export type SymbolMetaWithDeps<
-    TKind extends SymbolKind = SymbolKind
-> = SymbolMeta<TKind> & {
-    /**
-     * References to all the symbol's this symbol _depends on_ to
-     * perform it's job.
-     * 
-     * - each element is a _fully qualified name_ for dependency
-     * which can be looked up in the symbols cache.
-     */
-    dependsOn: FQN[];
-
-    /**
-     * References all the symbols which depend on this symbol
-     */
-    usedBy: FQN[];
 }
 
 /**

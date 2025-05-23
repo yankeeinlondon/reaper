@@ -1,6 +1,6 @@
 import {  Symbol } from "ts-morph";
 import { SymbolSummary } from "~/types";
-import { createFullyQualifiedNameForSymbol, getSymbolKind, getSymbolScope } from "./symbols";
+import { createFullyQualifiedNameForSymbol, getSymbolKind, getSymbolScope } from "./asSymbolsMeta";
 
 export function getSymbolsSummary(symbols: Symbol[]): SymbolSummary[] {
     const summary: SymbolSummary[] = [];

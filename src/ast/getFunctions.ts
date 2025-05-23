@@ -5,7 +5,7 @@ import {
     TypeChecker,
     Node
 } from "ts-morph";
-import { FnTypes } from "~/types/general";
+import { FnType } from "~/types/general";
 
 
 /**
@@ -15,13 +15,13 @@ import { FnTypes } from "~/types/general";
  * just certain _types_ of functions but by default it will find 
  * all types.
  */
-export function getFunctions<T extends readonly FnTypes[]>(
+export function getFunctions<T extends readonly FnType[]>(
     sourceFiles: SourceFile[], 
     checker: TypeChecker,
     ...types: T
 ): Symbol[] {
     let scope: Symbol[] = [];
-    const unique = Array.from(new Set<FnTypes>(types));
+    const unique = Array.from(new Set<FnType>(types));
 
     if(unique.length === 1 && unique[0] === "named-fn") {
         // in this case we ONLY need SymbolFlags.Function

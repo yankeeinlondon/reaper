@@ -1,4 +1,4 @@
-import { Opt, Suggest } from "inferred-types";
+import { Opt, SemanticVersion, Suggest } from "inferred-types";
 
 type NpmPrefix = "" | "^" | ">=" | ">" | "~";
 type NpmVersionNum = `${number}${Opt<`.${number}`>}${Opt<`.${number}`>}`;
@@ -18,10 +18,14 @@ type RelativePath = `.${string}`
 export type PackageJson = {
     /** The name of the package. */
     name?: string;
-    /** The version of the package, typically following semantic versioning. */
-    version?: string;
+    /** 
+     * The version of the package, typically following semantic
+     * versioning. 
+     */
+    version?: Suggest<SemanticVersion<false>>;
     /** A short description of the package. */
     description?: string;
+
     /** The entry point of the package, usually for CommonJS modules. */
     main?: string;
     /** The module entry point for ES modules. */
@@ -45,7 +49,7 @@ export type PackageJson = {
     /** A list of contributors to the package, as strings or objects with details. */
     contributors?: (string | { name: string; email?: string; url?: string })[];
     /** The license for the package, typically an SPDX identifier. */
-    license?: string;
+    license?: Suggest<"MIT">;
     /** Repository information for the package. */
     repository?: string | { type?: string; url: string; directory?: string };
     /** Information about how to report bugs in the package. */

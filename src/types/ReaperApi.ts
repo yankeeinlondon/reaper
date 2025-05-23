@@ -1,10 +1,7 @@
 import {
-    And,
     AsArray,
     Contains,
-    ExpandDictionary,
     If,
-    Not,
 } from "inferred-types";
 import {
     Diagnostic,
@@ -18,20 +15,21 @@ import {
 
 import {
     SymbolKind,
-    SymbolMeta,
-    SymbolScope
+    SymbolsMeta,
 } from "src/types/symbol-ast-types";
-import { FileDiagnostic } from "./file-ast-types";
+import { FileDiagnostic, FileMeta } from "./file-ast-types";
 import { DiagnosticError } from "~/errors";
 import { PackageJson } from "./package";
+import { SourceFilePath, SymbolScope } from "./general";
+import { FunctionMeta } from "./FunctionMeta";
+import { TypeUtilityRef, VariableRef } from "./reference-types";
+import { SymbolMeta } from "./SymbolMeta";
 
 export type Feature =
     | "diagnostics"
     | "diagnosticsPartial"
-    | "symbols"
-    | "symbolsPartial"
-    | "symbolMeta"
-    | "parsed";
+    | "runtime"
+    | "types";
 
 export type Fluent<
     T extends readonly Feature[],
@@ -53,94 +51,84 @@ export type SymbolSummary = {
     scope: SymbolScope
 }
 
-export type ReaperApi__Symbols__None<T extends readonly Feature[]> = {
+
+export type ReaperApi__Runtime__None<T extends readonly Feature[]> = {
     /** 
-     * Adds _some_ or _all_ of the project's `Symbol`'s to the
-     * Fluent API under the `symbols` property.
+     * Finds all the runtime's Symbols and provides an API
+     * surface for it under the `runtime` property.
      */
-    getSymbols: If<
-        Contains<T, "symbols">,
-        never,
-        <
-            P extends readonly string[] | undefined
-        >(partial?: P) => P extends undefined
-            ? Fluent<T, "symbols">
-            : Fluent<T, ["symbols", "symbolsPartial"]>
-    >;
+    getRuntime: () => Fluent<T, "runtime">;
 }
 
-export type ReaperApi__Symbols__Base<T extends readonly Feature[]> =
-    Contains<T, "symbolMeta"> extends true
-    ? ReaperApi__Symbols__NoMeta<T> & ReaperApi__Symbols__Meta
-    : {
-        /** 
-         * Adds a `symbols.meta` property to the Fluent API (as well
-         * as `toJSON()`, `toString()`, and `toConsole()`).
-         */
-        getSymbolsMeta: () => Fluent<T, "symbolMeta">;
-    } & ReaperApi__Symbols__NoMeta<T>
-
-export type ReaperApi__Symbols__Meta = {
-    /** all `Symbol` based resources */
-    symbols: {
-
-        /** 
-         * Metadata on all of the `Symbol`'s being analyzed.
-         */
-        meta: SymbolMeta[];
-
-        /**
-         * Returns a string intended for output on a console screen:
-         * 
-         * - by default returns _all_ symbols being analyzed 
-         * but you can reduce this to just `module`, `local`, 
-         * or `external` scopes.
-         * 
-         * **Note:** if you need greater control in your filtering of Symbols
-         * you can simply take the `symbols.meta` list and filter it and
-         * then map to the `.toConsole()` method which each `SymbolMeta`
-         * dictionary contains.
-         */
-        toScreen: <T extends SymbolScope>(scope?: T) => string;
-
-        /**
-         * A convenience method which allows conversion to a JSON string.
-         */
-        toJSON: <T extends SymbolScope>(scope?: T) => string;
-
-        /**
-         * A convenience method which allows conversion to a JSON string.
-         * 
-         * - **Note:** this is the same as `toJSON()` except that it's JSON
-         * is more compact (aka, no CRLF, etc.)
-         */
-        toString: <T extends SymbolScope>(scope?: T) => string;
+export type ReaperApi__Runtime__Ready<_T extends readonly Feature[]> = {
+    runtime: {
+        /** all the symbols related to the runtime environment */
+        ast: Symbol[],
+        functions: () => SymbolMeta<"function">[],
+        classes: () => SymbolMeta<"class">[],
+        variables: () => SymbolMeta<"variable">[]
     }
 }
 
-/** `symbols` property on API surface */
-export type ReaperApi__Symbols__NoMeta<
-    T extends readonly Feature[],
+export type ReaperApi__Types__None<T extends readonly Feature[]> = {
+    /** 
+     * Finds all the runtime's Symbols and provides an API
+     * surface for it under the `runtime` property.
+     */
+    getTypes: () => Fluent<T, "types">;
+}
+
+
+export type ReaperApi__Types__Loaded<
+    _T extends readonly Feature[]
 > = {
-    /** `Symbol` based resources */
-    symbols: {
-        /** a tuple of **ts-morph** `Symbol`'s */
-        ast: readonly Symbol[];
+    /** all the symbols related to the types/design environment */
+    ast: Symbol[],
+    /** all of the types defined in the repo */
+    types: () => SymbolMeta<"function">[],
+    /** all the type utilities defined in the repo */
+    typeUtilities: () => SymbolMeta<"class">[]
+}
 
-        /** 
-         * An indicator of whether "all" symbols have been included 
-         * or only a _partial_ (aka, specified) number of symbols.
-         */
-        isPartial: If<Contains<T, "symbolsPartial">, true, false>;
 
-        /**
-         * A tuple summary of all the symbols in the project.
-         * 
-         * - the `SymbolSummary` provides basics like `name`,`fqn`,
-         * `kind`, and `scope` for each symbol
-         */
-        summary: SymbolSummary[];
-    }
+
+export type ReaperApi__SourceFiles__Meta<_T extends readonly Feature[]> = {
+    fileImports: Map<SourceFilePath, ts.>;
+
+    reExports: Map<SourceFilePath, SymbolRef>;
+
+    exportedFunctions: Map<SourceFilePath, FuncRef>;
+    exportedClasses: Map<SourceFilePath, ClassRef>;
+
+    /** 
+     * Dictionary where:
+     *    - `keys` are the SourceFilePath
+     *    - `values` are an array of exported types
+     * 
+     * **Note:** _types_ are any type or interface definition 
+     * which **does not** have any **generics** associated with them.
+     */
+    exportedTypes: Map<SourceFilePath, TypeRef>;
+    /** 
+     * Dictionary where:
+     *    - `keys` are the SourceFilePath
+     *    - `values` are an array of exported types
+     * 
+     * **Note:** _types utilities_ are any type or interface definition 
+     * which **has** at least one **generic** parameter.
+     */
+    exportedTypeUtilities: Map<SourceFilePath, TypeUtilityRef>;
+    exportedValues: Map<SourceFilePath, VariableRef>;
+
+
+}
+
+export type FilesApi = (
+    () => FileMeta[]
+) & {
+    toString(): string;
+    toJSON(): string;
+    toConsole(): string;
 }
 
 
@@ -152,8 +140,11 @@ export type ReaperApi__SourceFiles<_T extends readonly Feature[]> = {
      * can use directly to get to **ts-morph** API's._
     */
     ast: SourceFile[];
-
-
+    files: FilesApi;
+    /**
+     * Get details (imports, exports, etc.) for a particular file.
+     */
+    getFileDetails(file: string): FileMeta;
 }
 
 export type ReaperApi__Diagnostics__None<T extends readonly Feature[]> = {
@@ -161,16 +152,12 @@ export type ReaperApi__Diagnostics__None<T extends readonly Feature[]> = {
      * Gets diagnostics across the project's files and returns
      * a Fluent API with the `diagnostics` property populated.
      */
-    getDiagnostics: If<
-        Contains<T, "diagnostics">,
-        never,
-        <P extends readonly string[]>(...partial: P) => P["length"] extends 0
+    getDiagnostics:  <P extends readonly string[]>(...partial: P) => P["length"] extends 0
             ? Fluent<T, "diagnostics">
             : Fluent<T, ["diagnostics", "diagnosticsPartial"]>
-    >;
 }
 
-export type ReaperApi__Diagnostics<T extends readonly Feature[]> = {
+export type ReaperApi__Diagnostics__Loaded<T extends readonly Feature[]> = {
     /** all diagnostic resources */
     diagnostics: {
         /**
@@ -251,14 +238,13 @@ export type ReaperApi<T extends readonly Feature[]> = {
      */
     sourceFiles: ReaperApi__SourceFiles<T>;
 
+
     features: T;
 } & (
-        Contains<T, "symbols"> extends true
-        ? ReaperApi__Symbols__Base<T>
-        : ReaperApi__Symbols__None<T>
+        ReaperApi__Symbols__Switch<T>
     ) & (
         Contains<T, "diagnostics"> extends true
-        ? ReaperApi__Diagnostics<T>
+        ? ReaperApi__Diagnostics__Loaded<T>
         : ReaperApi__Diagnostics__None<T>
     )
 

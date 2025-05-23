@@ -1,3 +1,4 @@
+import { PackageJson, SemanticVersion, Suggest } from "inferred-types";
 
 /**
  * The valid variant types of a function
@@ -6,7 +7,7 @@
  * - `arrow-fn` (e.g., `const greet = (name: string) => {...}`)
  * - `named-fn` (e.g., `type FnWithProps = ((name: string) => string) & { foo: "bar"}`)
  */
-export type FnTypes = "named-fn" | "arrow-fn" | "fn-intersection";
+export type FnType = "named-fn" | "arrow-fn" | "fn-intersection";
 
 /**
  * specifies the scope of where the symbol is available:
@@ -15,16 +16,13 @@ export type FnTypes = "named-fn" | "arrow-fn" | "fn-intersection";
  * - `module`: a symbol that _is_ exported by the repo being analyzed and
  * available anywhere the symbol is imported
  * - `external`: a symbol defined in an external repo/module 
- * 
- * In addition there is a `graph` scope which indicates that it is
- * a graph dependency of another Symbol.
  */
-export type SymbolScope = "local" | "module" | "external" | "graph";
+export type SymbolScope = "local" | "module" | "external";
 
 /**
  * A _fully-qualified-name_ for a Symbol.
  */
-export type FQN = `${"local" | "module" | "ext"}::${number}::${string}`
+export type FQN = `${"local" | "module" | "external"}::${number}::${string}`
 
 
 /**
@@ -34,3 +32,10 @@ export type GenericType = {
     name: string;
     type: string;
 }
+
+/**
+ * The path to a `SourceFile`
+ */
+export type SourceFilePath = string;
+
+

@@ -12,7 +12,7 @@ if(isError(info)) {
     exit(1);
 } else {
     console.log(
-        info.sourceFiles.ast
+        info.getSymbols().symbols.summary
         // info.pkg?.dependencies
     )
 }

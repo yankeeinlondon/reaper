@@ -1,5 +1,5 @@
 import { SourceFile, Symbol } from "ts-morph";
-import { getSymbolScope } from "./symbols";
+import { getSymbolScope } from "./asSymbolsMeta";
 
 /**
  * Gets all of the symbols across a project's files
