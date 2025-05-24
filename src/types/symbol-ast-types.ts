@@ -144,3 +144,42 @@ export type JsDocInfo = {
     comment: string;
     tags: JsDocTag[];
 }
+
+export type SymbolTypeKind = "union" | "intersection" | "type";
+
+export type SymbolType<T extends SymbolTypeKind = SymbolTypeKind> = {
+    kind: T;
+    /**
+     * The Typescript type for the symbol
+     */
+    type: any;
+    /**
+     * A text representation for the symbol
+     */
+    text: string;
+
+    /** 
+     * Is a literal type of `string`, `number`, or `boolean`
+     */
+    isLiteral: boolean;
+
+    /**
+     * The literal runtime value of the Symbol.
+     * 
+     * - this is the _runtime_ equivalent to the `type`
+     */
+    literalValue?: any;
+
+    /**
+     * is a container type like `Object` or `Array`
+     */
+    isContainer: boolean;
+
+    /** the Symbol is a **Readonly<Array<...>>** */
+    isReadonlyArray: boolean;
+    /***
+     * The constituant parts of a _union_ or _intersection_
+     * type. Only present for union/intersection.
+     */
+    parts?: SymbolType[];
+};

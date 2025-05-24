@@ -20,7 +20,7 @@ import { isError } from "@yankeeinlondon/kind-error";
 import { getSymbolsSummary } from "./ast/getSymbolsSummary";
 import { asSymbolsMeta } from "./ast/asSymbolsMeta";
 import { getSymbols } from "./ast/getSymbols";
-import { getDiagnostics, getFileDiagnostics } from "./ast/getDiagnostics";
+import { getDiagnostics, getFileDiagnostics } from "./ast/diagnostics/getDiagnostics";
 import { parsePackageJson } from "./utils/parsePackageJson";
 import { CWD, ROOT } from "./constants";
 import FastGlob from "fast-glob";
@@ -306,7 +306,7 @@ function provideFilesApi(files: SourceFile[]): FilesApi {
                 f.getExportSymbols,
                 (fn, args) => {
                     const symbols = fn(...args);
-                    addSymbols(symbols);
+                    (symbols);
                 }
             ),
             getImports: f.getImportDeclarations,

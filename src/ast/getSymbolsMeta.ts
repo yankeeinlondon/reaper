@@ -1,13 +1,16 @@
 import { Symbol } from "ts-morph";
-import { asSymbolsMeta } from "./asSymbolsMeta";
-import { SymbolsMeta } from "~/types";
+import { SymbolMeta } from "~/types";
+import { addSymbolsToCache } from "~/utils";
 
 /**
  * converts an array of **ts-morph** `Symbol`'s to
  * the `SymbolMeta` format.
+ * 
+ * **Note:** this is now just an alias for calling `addSymbolsToCache()`
+ * but it's name may feel more semantec so keeping for now.
  */
 export function getSymbolsMeta(
     ast: Symbol[]
-): SymbolsMeta[] {
-    return ast.map(i => asSymbolsMeta(i))
+): SymbolMeta[] {
+    return addSymbolsToCache(ast)
 }

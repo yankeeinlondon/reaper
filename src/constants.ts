@@ -17,6 +17,17 @@ export const ROOT = findRoot(CWD);
 export const SYMBOLS = new WeakMap<Symbol, SymbolMeta>;
 
 /**
- * Allows for the lookup of a `Symbol` based on a `SymbolRef`
+ * Allows for the lookup of a `Symbol` with a `SymbolRef`
  */
 export const SYMBOL_LOOKUP = new Map<SymbolRef, Symbol>;
+
+
+export const SYMBOL_REF_PREFIXES = [
+    "function",
+    "class",
+    "type",
+    "type-utility",
+    "variable",
+    "re-export",
+    "other"
+] as const;

@@ -1,9 +1,9 @@
 import { Symbol } from "ts-morph";
 import { FunctionParameter, FunctionReturn } from "./FunctionMeta";
-import { FnType, FQN, GenericType, SymbolScope } from "./general";
+import { FnType, FQN, GenericType, IsExportedSymbol, SymbolScope } from "./general";
 import { PackageJson } from "./package";
-import { ClassRef, TypeRef, TypeUtilityRef } from "./reference-types";
-import { JsDocInfo, SymbolFlagKey } from "./symbol-ast-types";
+import {  SymbolRef } from "./reference-types";
+import { JsDocInfo, SymbolFlagKey, SymbolType } from "./symbol-ast-types";
 
 export type AstKind =
     | "function"
@@ -11,14 +11,28 @@ export type AstKind =
     | "variable"
     | "type"
     | "type-utility"
-    | "re-export";
+    | "re-export"
+    | "other";
 
 export type ClassScope =
 | "public"
 | "protected"
 | "private";
 
-type ClassMethod = {
+
+export type Decorator = {
+    /** The name of the decorator (e.g., 'Injectable', 'Component') */
+    name: string;
+    /** The arguments passed to the decorator, if any (as strings or parsed values) */
+    arguments?: string[]; // or: any[] if you want to support parsed values
+    /** The full text of the decorator as it appears in the source */
+    text: string;
+};
+
+export type ClassMethod = {
+    /** the method name */
+    name: string;
+
     /**
      * The level of access this method provides:
      * 
@@ -33,8 +47,11 @@ type ClassMethod = {
      */
     jsDocs: JsDocInfo[];
 
-
     isAbstract: boolean;
+    isAsync: boolean;
+    isGenerator: boolean;
+
+    decorators: Decorator[];
 
     generics: GenericType[];
     /**
@@ -48,11 +65,12 @@ type ClassMethod = {
      */
     returnType: FunctionReturn;
 
+    toJSON(): string;
     toString(): string;
     toConsole(): string;
 }
 
-type KindSpecific<K extends AstKind> = K extends "function"
+export type KindSpecific<K extends AstKind> = K extends "function"
     ? {
         /**
          * The type of function:
@@ -76,7 +94,7 @@ type KindSpecific<K extends AstKind> = K extends "function"
     }
     : K extends "class"
     ? {
-        extends: (ClassRef | TypeRef | TypeUtilityRef)[];
+        extends: SymbolRef[];
         isAbstract: boolean;
 
         generics: GenericType[];
@@ -91,7 +109,7 @@ type KindSpecific<K extends AstKind> = K extends "function"
         methods: ClassMethod[];
 
         /** the signature of the class's constructor */
-        constructor: ClassMethod;
+        constructor?: ClassMethod;
     }
     : K extends "type"
     ? {
@@ -113,7 +131,7 @@ type KindSpecific<K extends AstKind> = K extends "function"
     }
     :{};
 
-type ScopeSpecific<S extends SymbolScope> = S extends "external"
+export type ScopeSpecific<S extends SymbolScope> = S extends "external"
     ? {
         /** information about the external source */
         externalSource: PackageJson
@@ -125,9 +143,20 @@ export type SymbolMeta<
     K extends AstKind = AstKind,
     S extends SymbolScope = SymbolScope
 > = {
+    __kind: "SymbolMeta";
+    
     symbol: Symbol;
 
+    /**
+     * The _type information_ for the `Symbol`
+     */
+    type: SymbolType;
+
+    /**
+     * A broad categorization for 
+     */
     astKind: K;
+
     /**
      * The scope for which the symbol is available:
      *  - `local` - local symbol definition, not exported in project
@@ -147,6 +176,8 @@ export type SymbolMeta<
      */
     filepath: string;
 
+    isExported: IsExportedSymbol;
+
     /**
      * The JSDocs comments for the symbol as a whole
      * 
@@ -162,7 +193,7 @@ export type SymbolMeta<
 
     /** 
      * the epoch date of when this symbol was last changed in file system */
-    updated: number;
+    updated: EpochTimeStamp;
 
     startLine: number;
     endLine: number;
@@ -170,9 +201,20 @@ export type SymbolMeta<
     /**
      * Get's the full text for the symbol
      */
-    getText(): string;
+    getText(includeJsDocComments?: boolean): string;
 
+    /**
+     * Make the data structure _serialiable_ and then stringify
+     * it into JSON format.
+     */
     toJSON(): string;
+    /**
+     * Produce a concise textual description of the symbol.
+     */
     toString(): string;
+    /**
+     * Similar to `toString()` but with ANSI escape sequences
+     * for color and formatting appropriate for a terminal console.
+     */
     toConsole(): string;
 } & KindSpecific<K> & ScopeSpecific<S>

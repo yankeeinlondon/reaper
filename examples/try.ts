@@ -12,7 +12,7 @@ if(isError(info)) {
     exit(1);
 } else {
     console.log(
-        info.getSymbols().symbols.summary
+        info.
         // info.pkg?.dependencies
     )
 }

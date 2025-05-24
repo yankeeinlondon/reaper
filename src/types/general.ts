@@ -1,4 +1,5 @@
 import { PackageJson, SemanticVersion, Suggest } from "inferred-types";
+import { SymbolRef } from "./reference-types";
 
 /**
  * The valid variant types of a function
@@ -22,7 +23,7 @@ export type SymbolScope = "local" | "module" | "external";
 /**
  * A _fully-qualified-name_ for a Symbol.
  */
-export type FQN = `${"local" | "module" | "external"}::${number}::${string}`
+export type FQN = SymbolRef;
 
 
 /**
@@ -39,3 +40,8 @@ export type GenericType = {
 export type SourceFilePath = string;
 
 
+/**
+ * Indicates whether a Symbol is _exported_ or not and if it is
+ * what type of export it is.
+ */
+export type IsExportedSymbol = false | "named" | "default" | "re-exported";
