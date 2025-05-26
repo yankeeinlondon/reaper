@@ -1,9 +1,8 @@
 import { isArray, isString, ObjectKey } from "inferred-types";
 import { SourceFile } from "ts-morph";
-import { getFileDiagnostics } from "./files";
-import { FileDiagnostic } from "../types/file-ast-types";
 import { isSourceFile } from "src/type-guards";
-import { TestFile } from "../types/testing-types";
+import { FileDiagnostic } from "~/types";
+import { getFileDiagnostics } from "./getDiagnostics";
 
 export type BlockType = {
     startLine: number;
@@ -11,17 +10,6 @@ export type BlockType = {
     [key: ObjectKey]: unknown
 }
 
-
-export const getErrorDiagnostics = (
-    input: SourceFile | FileDiagnostic[],
-    ...ignore: number[]
-) => {
-    const diag: FileDiagnostic[] = isSourceFile(input)
-            ? getFileDiagnostics(input)
-            : input;
-
-    return diag.filter(d => !ignore.includes(d.code))
-}
 
 
 
@@ -72,11 +60,3 @@ export const getDiagnosticsOutsideBlocks = (
 }
 
 
-export const hasDiagnostics = (file: TestFile | SourceFile): boolean => {
-    if (isSourceFile(file)) {
-        const d = file.getPreEmitDiagnostics();
-        return d.length > 0
-    } else {
-        return file.blocks.flatMap(b => b.diagnostics).length > 0
-    }
-}

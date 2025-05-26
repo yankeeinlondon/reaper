@@ -1,13 +1,13 @@
 import { Symbol, TypeChecker } from "ts-morph";
-import { FunctionParameter, FnType } from "~/types";
+import { FunctionParameter, FnVariant } from "~/types";
 import {  } from "~/types";
-import { isFunction } from "~/type-guards";
+import { isFunctionVariant } from "~/type-guards";
 
 export function getFunctionParameters(
     sym: Symbol,
-    options?: { fnType?: FnType | false; checker?: TypeChecker }
+    options?: { fnVariant?: FnVariant | false; checker?: TypeChecker }
 ): FunctionParameter[] {
-    const type = options?.fnType || isFunction(sym);
+    const type = options?.fnVariant || isFunctionVariant(sym);
     const decl = sym.getDeclarations()[0];
     if (!decl) return [];
     const checker = options?.checker;

@@ -1,1 +1,2 @@
-export * from "./getVariableMeta"
+export * from "./getVariableMeta";
+export * from "./getVariableScope";

@@ -31,3 +31,28 @@ export const InvalidSymbol = createKindError(
     "InvalidSymbol",
     { library: "@yankeeinlondon/reaper" }
 )
+
+
+export const InvalidFilepath = createKindError(
+    "InvalidFilepath",
+    { library: "@yankeeinlondon/reaper" }
+)
+
+export const InvalidFileRef = createKindError(
+    "InvalidFilepath",
+    { library: "@yankeeinlondon/reaper" }
+)
+
+export const InvalidNodeRef = createKindError(
+    "InvalidNodeRef",
+    { library: "@yankeeinlondon/reaper" }
+)
+
+
+export const InvalidPath = createKindError(
+    "InvalidPath"
+)
+
+export const NotFound = createKindError(
+    "NotFound"
+)

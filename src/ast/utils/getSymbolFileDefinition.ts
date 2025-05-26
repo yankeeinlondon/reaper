@@ -2,6 +2,10 @@ import { relative } from "path";
 import { cwd } from "process";
 import { Symbol } from "ts-morph";
 
+/**
+ * Returns a `filepath`, `startLine`, and `endLine` for the passed
+ * in **ts-morph** `Symbol`.
+ */
 export const getSymbolFileDefinition = (sym: Symbol): {
     filepath: string;
     startLine: number;

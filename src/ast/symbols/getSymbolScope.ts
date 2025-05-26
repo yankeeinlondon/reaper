@@ -1,7 +1,7 @@
 import { Symbol } from "ts-morph";
 import { SymbolScope } from "~/types";
-import { getSymbolKind } from "./utils/getSymbolKind";
-import { isExportedSymbol } from "~/type-guards";
+import { getExportType } from "~/type-guards";
+import { getSymbolKind } from "../utils";
 
 /**
  * Determines the scope of the given symbol.
@@ -32,7 +32,7 @@ export function getSymbolScope(symbol: Symbol): SymbolScope {
     }
 
 
-    if (isExportedSymbol(symbol)) {
+    if (getExportType(symbol)) {
         return 'module';
     }
 

@@ -1,6 +1,11 @@
 import { Symbol, Node } from "ts-morph";
 import { GenericType } from "~/types";
 
+
+/**
+ * gets the **generic** variables defined on the passed in
+ * **ts-morph** `Symbol`
+ */
 export function getSymbolGenerics(symbol: Symbol): GenericType[] {
     const declarations = (symbol.getAliasedSymbol() || symbol).getDeclarations()
     const generics: GenericType[] = [];

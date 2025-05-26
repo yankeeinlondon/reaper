@@ -1,12 +1,12 @@
 import { Symbol, TypeChecker } from "ts-morph";
-import { FnType, FunctionReturn } from "~/types";
-import { isFunction } from "~/type-guards";
+import { FnVariant, FunctionReturn } from "~/types";
+import { isFunctionVariant } from "~/type-guards";
 
 export function getFunctionReturn(
     sym: Symbol,
-    options?: { fnType?: FnType | false; checker?: TypeChecker }
+    options?: { fnVariant?: FnVariant | false; checker?: TypeChecker }
 ): FunctionReturn {
-    const type = options?.fnType || isFunction(sym);
+    const type = options?.fnVariant || isFunctionVariant(sym);
     const decl = sym.getDeclarations()[0];
     if (!decl) return { type: "unknown" };
     const checker = options?.checker;

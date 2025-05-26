@@ -1,36 +1,31 @@
-import { DiagnosticCategory } from "ts-morph";
-import { SymbolReference } from "./symbol-ast-types";
+import { Diagnostic, DiagnosticCategory, SourceFile } from "ts-morph";
 import { DiagnosticError } from "~/errors";
+import { PackageJson } from "inferred-types";
+import { SymbolRef } from "./reference-types";
+import { FILE_REF_PREFIX } from "~/constants";
+import { DiagRef } from "./diagnostic-types";
 
 
-export type FileDiagnostic = {
-    /** the TS Error code */
-    readonly code: number;
-    readonly category: DiagnosticCategory;
-    /** the error message */
-    readonly msg: string;
-    readonly filepath: string | undefined;
-    readonly loc: {
-        readonly lineNumber: number;
-        readonly column: number;
-        readonly start: number | undefined;
-        readonly length: number | undefined;
-    }
+export type FileRef = `${typeof FILE_REF_PREFIX}${string}`
 
-    toError(): typeof DiagnosticError["errorType"];
+
+export type InternalSymbolImport = {
+    __kind: "SymbolImport";
+    source: "internal";
+    symbol: SymbolRef;
+    /** where is this file defined */
+    definedIn: SourceFile;
 }
 
-export type SymbolImport = {
-    symbol: SymbolReference;
-    as: string;
-    source: string;
-    exportKind: "default" | "named";
-    /**
-     * whether the import is for an external repo or something
-     * within the current repo.
-     */
-    isExternalSource: boolean;
+export type ExternalSymbolImport = {
+    __kind: "SymbolImport";
+    source: "external";
+    symbol: SymbolRef;
+    package: PackageJson;
 }
+
+export type SymbolImport = InternalSymbolImport | ExternalSymbolImport;
+
 
 /**
  * **FileLookup**
@@ -52,9 +47,14 @@ export type FileLookup = {
 }
 
 
+
+/**
+ * cached metadata for source files
+ */
 export type FileMeta = {
-    /** The relative path to the file from the project root */
-    filepath: string;
+    __kind: "FileMeta";
+    /** A reference to this `FileMeta` in the files cache */
+    fileRef: FileRef;
 
     /**
      * Symbols _imported_ by the file. This includes both internal
@@ -66,13 +66,13 @@ export type FileMeta = {
      * Symbols _defined_ in the file. This includes types, interfaces,
      * classes and other exported symbols.
      */
-    symbols: SymbolReference[];
+    symbols: SymbolRef[];
 
     /**
      * TypeScript compiler diagnostics found in the file.
      * Includes errors, warnings and suggestions.
      */
-    diagnostics: FileDiagnostic[];
+    diagnostics: DiagRef[];
 
     /**
      * A hash which detects whether the symbol's imported

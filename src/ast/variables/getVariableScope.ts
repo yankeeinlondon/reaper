@@ -12,7 +12,7 @@ export type VariableScope = "var" | "const" | "let";
  * - `var`, `const`, or `let` indicate it **is** a variable as 
  * well as what scope the variable was declared with
  */
-export type IsVariable = false | VariableScope;
+export type TryVariableScope = false | VariableScope;
 
 
 /**
@@ -24,8 +24,10 @@ export type IsVariable = false | VariableScope;
  *  - `false` if _not_ a variable symbol
  *  - `var`, `const`, or `let` to indicate what predicate was used
  * in declaring this this variable
+ * 
+ * **Related:** `isSymbolVariable`
  */
-export function isVariable(sym: Symbol): IsVariable {
+export function getVariableScope(sym: Symbol): TryVariableScope {
     for (const decl of sym.getDeclarations()) {
         if (Node.isVariableDeclaration(decl)) {
             const parent = decl.getParent();

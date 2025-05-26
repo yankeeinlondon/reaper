@@ -1,6 +1,6 @@
 
 
-import { FileDiagnostic, SymbolImport } from "./file-ast-types";
+import { FileDiagnostic, SymbolImport } from "./file-types";
 import {  SymbolReference } from "./symbol-ast-types";
 
 export type TypeTest = {

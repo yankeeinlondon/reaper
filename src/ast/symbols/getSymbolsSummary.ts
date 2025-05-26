@@ -1,15 +1,17 @@
 import {  Symbol } from "ts-morph";
 import { SymbolSummary } from "~/types";
-import { createFullyQualifiedNameForSymbol, getSymbolKind, getSymbolScope } from "./asSymbolsMeta";
+import { getAstKind } from "../utils";
+import { getSymbolScope } from "./getSymbolScope";
+
 
 export function getSymbolsSummary(symbols: Symbol[]): SymbolSummary[] {
     const summary: SymbolSummary[] = [];
 
     for (const s of symbols) {
 
-        const kind = getSymbolKind(s);
+        const kind = getAstKind(s);
         const scope = getSymbolScope(s);
-        const fqn = createFullyQualifiedNameForSymbol(s);
+        const fqn = s.getFullyQualifiedName();
 
         summary.push({
             name: s.getName(),

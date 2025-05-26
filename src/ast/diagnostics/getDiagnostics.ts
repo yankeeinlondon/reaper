@@ -1,10 +1,10 @@
-import { isString } from "inferred-types";
-import { relative } from "node:path";
-import { Diagnostic, SourceFile, ts } from "ts-morph";
+import { isString, Never } from "inferred-types";
+import { Diagnostic, DiagnosticCategory, SourceFile, ts } from "ts-morph";
 import { isSourceFile, isTsDiagnostic } from "~/type-guards";
-import { FileDiagnostic } from "~/types";
-import { ROOT } from "~/constants"
-import { DiagnosticError } from "~/errors";
+import { DiagnosticLevel, FileDiagnostic } from "~/types";
+import { DiagnosticError, InvalidFilepath } from "~/errors";
+import { asFileRef } from "../files";
+import { displayDiagnostic, displayFile } from "~/report";
 
 
 /**
@@ -14,31 +14,48 @@ import { DiagnosticError } from "~/errors";
  * a _serializable_ `FileDiagnostic`.
  */
 function asFileDiagnostic(
-    diagnostic: Diagnostic<ts.Diagnostic>
+    diagnostic: Diagnostic<ts.Diagnostic>,
+    opts: { filepath?: string } = {}
 ): FileDiagnostic {
+    const filepath = opts.filepath || diagnostic.getSourceFile()?.getFilePath().toString();
 
     const code = isTsDiagnostic(diagnostic)
         ? diagnostic.code
         : diagnostic.getCode();
 
+
     const msg = isTsDiagnostic(diagnostic)
-        ? isString(diagnostic.messageText) 
-            ? diagnostic.messageText 
-            : "getMessageText" in diagnostic && typeof diagnostic.getMessageText === "function" 
+        ? isString(diagnostic.messageText)
+            ? diagnostic.messageText
+            : "getMessageText" in diagnostic && typeof diagnostic.getMessageText === "function"
                 ? String(diagnostic.getMessageText())
                 : "UNKNOWN"
         : String(diagnostic.getMessageText());
 
 
+    if(!filepath) {
+        throw InvalidFilepath(`Unresolvable filepath in diagnostic passed to asFileDiagnostic()`, { diagnostic: msg, code });
+    }
+
+
     const category = isTsDiagnostic(diagnostic)
         ? diagnostic.category
         : diagnostic.getCategory();
+    const level: DiagnosticLevel = category === DiagnosticCategory.Error
+        ? "error"
+        : category === DiagnosticCategory.Warning
+            ? "warning"
+            : category === DiagnosticCategory.Suggestion
+                ? "suggestion"
+                : category === DiagnosticCategory.Message
+                    ? "message"
+                    : Never
 
-    const start = isTsDiagnostic(diagnostic) 
-        ? diagnostic.start 
+    const start = isTsDiagnostic(diagnostic)
+        ? diagnostic.start
         : diagnostic.getStart();
-    const length = isTsDiagnostic(diagnostic) 
-        ? diagnostic.length 
+    const length = isTsDiagnostic(diagnostic)
+        ? diagnostic.length
         : diagnostic.getLength();
     const { line, character } = isTsDiagnostic(diagnostic)
         ? { line: start || 0, character: length || 0 }
@@ -46,35 +63,41 @@ function asFileDiagnostic(
             (diagnostic.getSourceFile() as SourceFile).compilerNode,
             diagnostic.getStart() || 0
         );
-    const filepath = isTsDiagnostic(diagnostic)
-        ? diagnostic.file?.fileName
-        : diagnostic.getSourceFile()?.getFilePath();
 
-    const payload =  {
+    const payload: FileDiagnostic = {
         code,
         msg,
-        category,
-        filepath: filepath 
-            ? relative(ROOT, filepath) : undefined,
+        level,
+        fileRef: asFileRef(filepath),
         loc: {
             lineNumber: line + 1,
             column: character + 1,
             start,
             length
-        }
-    } satisfies Omit<FileDiagnostic, "toError">;
-
-    return {
-        ...payload,
+        },
+        toString() {
+            return displayDiagnostic(this, { format: "text"})
+        },
+        toConsole() {
+            return displayDiagnostic(this, {format: "console"})
+        },
+        toJSON() {
+            return JSON.stringify(this);
+        },
         toError() {
-            return DiagnosticError(msg, { code, filepath, loc: payload.loc })
+            return DiagnosticError(msg, { filepath, level, code })
         }
-    }
-}
+    };
+
+    return payload
+};
+
+
+
 
 
 /**
- * Converts raw `Diagnostic` data to `FileDiagnostic` data
+ * Takes raw `Diagnostic` data to `FileDiagnostic` data
  * which provides additional context based on `SourceFile`
  * information.
  */
@@ -85,7 +108,7 @@ export function getFileDiagnostics(
 
     if (files.length === 0) {
         return []
-    } else if ( isSourceFile(files[0]) ) {
+    } else if (isSourceFile(files[0])) {
         for (const file of (files as SourceFile[])) {
             const diag = file.getPreEmitDiagnostics();
             const fd = diag.map(d => asFileDiagnostic(d));

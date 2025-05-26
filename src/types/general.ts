@@ -8,7 +8,7 @@ import { SymbolRef } from "./reference-types";
  * - `arrow-fn` (e.g., `const greet = (name: string) => {...}`)
  * - `named-fn` (e.g., `type FnWithProps = ((name: string) => string) & { foo: "bar"}`)
  */
-export type FnType = "named-fn" | "arrow-fn" | "fn-intersection";
+export type FnVariant = "named-fn" | "arrow-fn" | "fn-intersection";
 
 /**
  * specifies the scope of where the symbol is available:
@@ -44,4 +44,14 @@ export type SourceFilePath = string;
  * Indicates whether a Symbol is _exported_ or not and if it is
  * what type of export it is.
  */
-export type IsExportedSymbol = false | "named" | "default" | "re-exported";
+export type ExportType = false | "named" | "default" | "re-exported";
+
+/**
+ * the output format you're targetting
+ */
+export type OutputFormat = "console" | "text";
+
+
+export type DisplayOpts = {
+    format?: OutputFormat
+}

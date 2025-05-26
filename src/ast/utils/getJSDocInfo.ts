@@ -1,8 +1,11 @@
 import { Symbol, Node } from "ts-morph";
 import { JsDocInfo } from "~/types";
 
-
-export function getSymbolsJSDocInfo(symbol: Symbol): JsDocInfo[] {
+/**
+ * get's the **JSDoc** information supplied on the current
+ * **ts-morph** `Symbol`.
+ */
+export function getJsDocInfo(symbol: Symbol): JsDocInfo[] {
     const declarations = symbol.getDeclarations();
     const jsDocInfo = declarations.map(declaration => {
         if (Node.isJSDocable(declaration)) {

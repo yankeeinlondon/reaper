@@ -1,5 +1,5 @@
 import { Symbol } from "ts-morph";
-import { isVariable } from "./isVariable";
+import { getVariableScope } from "./getVariableScope";
 import { InvalidSymbol } from "~/errors";
 
 /**
@@ -12,7 +12,7 @@ import { InvalidSymbol } from "~/errors";
 export function getVariableMeta(
     sym: Symbol
 ) {
-    const scope = isVariable(sym);
+    const scope = getVariableScope(sym);
 
     if(!scope) {
         throw InvalidSymbol(`A call to getVariableMeta(sym) received a non-variable based Symbol!`, { 

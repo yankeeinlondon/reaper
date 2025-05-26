@@ -30,12 +30,6 @@ export type SymbolKind =
     | "other";
 
 
-export type SymbolReference = {
-    name: string;
-    kind: SymbolKind;
-    fqn: FQN;
-}
-
 /**
  * **symbolsMeta**
  * 

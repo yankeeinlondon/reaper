@@ -1,6 +1,6 @@
 import { Node, Symbol, TypeChecker } from "ts-morph";
 import { ClassMethod, GenericType } from "~/types";
-import { FunctionParameter, FunctionReturn } from "~/types/FunctionMeta";
+import { FunctionParameter, FunctionReturn } from "~/types/function-types";
 import { JsDocInfo } from "~/types/symbol-ast-types";
 import { getFunctionParameters } from "../functions/getFunctionParameters";
 import { getFunctionReturn } from "../functions/getFunctionReturn";

@@ -1,6 +1,6 @@
 import { Symbol } from "ts-morph";
 import { SymbolMeta } from "~/types";
-import { addSymbolsToCache } from "~/utils";
+import { addSymbolsToCache } from "~/ast";
 
 /**
  * converts an array of **ts-morph** `Symbol`'s to

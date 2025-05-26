@@ -5,7 +5,7 @@ import { Diagnostic, ts } from "ts-morph";
  * type guard which validates passed in value is a `Diagnostic` from
  * **ts-morph**.
  */
-export const isTsMorphDiagnostic = (val: unknown): val is Diagnostic => {
+export const isDiagnostic = (val: unknown): val is Diagnostic => {
   return isObject(val) && "getCode" in val && typeof val.getCode === "function" && "getStart" in val
 }
 

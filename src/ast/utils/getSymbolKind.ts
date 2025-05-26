@@ -10,6 +10,9 @@ import { SymbolKind } from "~/types";
 /**
  * categorizes a **ts-morph** `Symbol` into a broad category defined
  * by the `SymbolKind` type alias.
+ * 
+ * @deprecated this will likely be removed in favor of using only
+ * `AstKind` and the `getAstKind()` utility.
  */
 export const getSymbolKind = (symbol: Symbol): SymbolKind => {
     const sym = symbol.getAliasedSymbol() || symbol;

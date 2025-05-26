@@ -17,13 +17,12 @@ import {
     SymbolKind,
     SymbolsMeta,
 } from "src/types/symbol-ast-types";
-import { FileDiagnostic, FileMeta } from "./file-ast-types";
+import { FileDiagnostic, FileMeta } from "./file-types";
 import { DiagnosticError } from "~/errors";
 import { PackageJson } from "./package";
 import { SourceFilePath, SymbolScope } from "./general";
-import { FunctionMeta } from "./FunctionMeta";
-import { TypeUtilityRef, VariableRef } from "./reference-types";
-import { SymbolMeta } from "./SymbolMeta";
+import { FunctionRef, ReExportRef, TypeUtilityRef, VariableRef } from "./reference-types";
+import { AstKind, SymbolMeta } from "./SymbolMeta";
 
 export type Feature =
     | "diagnostics"
@@ -46,7 +45,7 @@ export type SymbolSummary = {
     /** a fully qualified name for the Symbol */
     fqn: string,
     /** a broad level categorization of the Symbol */
-    kind: SymbolKind,
+    kind: AstKind,
     /** the scope (local, module, external) of the Symbol */
     scope: SymbolScope
 }
@@ -93,11 +92,10 @@ export type ReaperApi__Types__Loaded<
 
 
 export type ReaperApi__SourceFiles__Meta<_T extends readonly Feature[]> = {
-    fileImports: Map<SourceFilePath, ts.>;
+    fileImports: any;
 
-    reExports: Map<SourceFilePath, SymbolRef>;
-
-    exportedFunctions: Map<SourceFilePath, FuncRef>;
+    reExports: Map<SourceFilePath, ReExportRef[]>;
+    exportedFunctions: Map<SourceFilePath, FunctionRef[]>;
     exportedClasses: Map<SourceFilePath, ClassRef>;
 
     /** 
@@ -140,6 +138,9 @@ export type ReaperApi__SourceFiles<_T extends readonly Feature[]> = {
      * can use directly to get to **ts-morph** API's._
     */
     ast: SourceFile[];
+    /** 
+     * Get file details for _all_ source files.
+     */
     files: FilesApi;
     /**
      * Get details (imports, exports, etc.) for a particular file.
@@ -210,6 +211,7 @@ export type ReaperApi__Diagnostics__Loaded<T extends readonly Feature[]> = {
         toError: () => typeof DiagnosticError.errorType[];
     }
 }
+
 
 
 export type ReaperApi<T extends readonly Feature[]> = {

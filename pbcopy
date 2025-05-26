@@ -1,0 +1,22 @@
+
+> @yankeeinlondon/reaper@1.0.0 test /Volumes/coding/personal/reaper
+> vitest run getGitIgnore
+
+
+ RUN  v3.1.4 /Volumes/coding/personal/reaper
+
+ ❯ tests/utils/getGitIgnore.test.ts (4 tests | 3 failed) 7ms
+   × getGitignore > returns an empty array if no .gitignore exists 4ms
+     → expected [ '*.log', 'npm-debug.log*', …(32) ] to deeply equal []
+   × getGitignore > parses .gitignore and removes comments and blank lines 1ms
+     → expected [ '*.log', 'npm-debug.log*', …(32) ] to deeply equal [ 'node_modules', 'dist', …(1) ]
+   × getGitignore > trims whitespace and ignores lines starting with # 1ms
+     → expected [ '*.log', 'npm-debug.log*', …(32) ] to deeply equal [ 'foo', 'bar' ]
+   ✓ getGitignore > returns correct result when .gitignore is in repo root 0ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  09:07:19
+   Duration  181ms (transform 20ms, setup 0ms, collect 29ms, tests 7ms, environment 0ms, prepare 28ms)
+
+ ELIFECYCLE  Test failed. See above for more details.
