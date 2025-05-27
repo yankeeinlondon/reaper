@@ -12,12 +12,25 @@ import { getSymbolGenerics } from "./getSymbolGenerics";
  * (which has Generic parameters).
  */
 export function isTypeSymbol(sym: Symbol): boolean {
-    const flags = getSymbolFlags(sym);
-
-    return flags.includes("Type")
-      || flags.includes("TypeAlias")
-      || flags.includes("TypeLiteral")
-      || flags.includes("Interface");
+    // If this is an import alias, resolve to the original symbol
+    const target = typeof sym.getAliasedSymbol === "function" && sym.getAliasedSymbol() || sym;
+    const flags = getSymbolFlags(target);
+    const isFlagType =
+        flags.includes("Type") ||
+        flags.includes("TypeAlias") ||
+        flags.includes("TypeLiteral") ||
+        flags.includes("Interface");
+    const decls = target.getDeclarations();
+    const isDeclType = decls.some(decl => {
+        const kind = decl.getKindName();
+        return (
+            kind === "TypeAliasDeclaration" ||
+            kind === "InterfaceDeclaration" ||
+            kind === "TypeParameter" ||
+            kind === "TypeLiteral"
+        );
+    });
+    return isFlagType || isDeclType;
 }
 
 /**

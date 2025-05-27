@@ -1,11 +1,12 @@
 import type { Symbol } from "ts-morph";
+import { ts } from "ts-morph";
 import type { SymbolFlagKey } from "~/types";
 
 function reverseLookupEnum(enumObj: object) {
     return (value: number): SymbolFlagKey[] => {
         return Object.entries(enumObj)
-            .filter(([_key, val]) => typeof val === "number" && (value & val) === val)
-            .map(([key]) => key as SymbolFlagKey) || `unknown(${value})`;
+            .filter(([_key, val]) => typeof val === "number" && (value & (val as number)) !== 0)
+            .map(([key]) => key as SymbolFlagKey) || [`unknown(${value})` as SymbolFlagKey];
     };
 }
 
@@ -20,5 +21,5 @@ function reverseLookupEnum(enumObj: object) {
  */
 export function getSymbolFlags<T extends Symbol>(sym: T): SymbolFlagKey[] {
     const flag = sym.getFlags();
-    return reverseLookupEnum(sym)(flag);
+    return reverseLookupEnum(ts.SymbolFlags)(flag);
 }

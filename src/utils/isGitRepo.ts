@@ -1,7 +1,7 @@
 import type { SimpleGit } from "simple-git";
 import simpleGit from "simple-git";
 import { getRoot, MAX_CONCURRENT_PROCESSES } from "~/constants";
-import { repoRoot } from "./repoRoot";
+import { repoRoot } from "repo-root";
 
 /**
  * Checks if current directory is part of a repo and if it

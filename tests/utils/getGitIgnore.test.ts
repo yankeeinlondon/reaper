@@ -15,13 +15,13 @@ const SRC_DIR = join(TEST_DIR, "/src");
 const GIT_DIR = join(TEST_DIR, "/.git");
 
 const PACKAGE_FILE = join(TEST_DIR, "package.json");
-const GITIGNORE_FILE = join(SRC_DIR, ".gitignore");
+const GITIGNORE_FILE = join(TEST_DIR, ".gitignore");
 const HEAD_FILE = join(GIT_DIR, "./HEAD");
 const SRC_FILE = join(TEST_DIR, "/src/index.ts");
 
-function setupTempDir(includePackage?: boolean) {
+function setupTempDir() {
     ensureDirExists(SRC_DIR);
-    ensureDirExists(GIT_DIR);
+    ensureDirExists(GIT_DIR); 
 
     if (!existsSync(PACKAGE_FILE)) writeFileSync(PACKAGE_FILE, "{}", "utf-8")
     if (!existsSync(HEAD_FILE)) writeFileSync(HEAD_FILE, "  ", "utf-8")
