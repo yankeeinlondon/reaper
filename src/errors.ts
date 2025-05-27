@@ -49,10 +49,3 @@ export const InvalidNodeRef = createKindError(
 )
 
 
-export const InvalidPath = createKindError(
-    "InvalidPath"
-)
-
-export const NotFound = createKindError(
-    "NotFound"
-)

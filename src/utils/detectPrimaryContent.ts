@@ -1,6 +1,6 @@
 import { getRoot } from "~/constants";
-import { isMonorepo } from "./isMonorepo";
-import { repoRoot } from "./repoRoot";
+import { isMonorepo } from "@yankeeinlondon/is-monorepo";
+import { repoRoot } from "repo-root";
 
 export type ContentType = 
 | "javascript"

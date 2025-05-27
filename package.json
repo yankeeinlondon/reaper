@@ -17,17 +17,20 @@
   "scripts": {
     "test": "vitest"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [],
   "author": "Ken Snyder <ken@ken.net>",
   "license": "MIT",
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
-    "@antfu/eslint-config": "^4.13.1",
+    "@antfu/eslint-config": "^4.13.2",
     "@type-challenges/utils": "^0.1.1",
     "@types/find-root": "^1.1.4",
-    "@types/node": "^22.15.20",
+    "@types/node": "^22.15.21",
     "bumpp": "^10.1.1",
-    "bun": "^1.2.13",
+    "bun": "^1.2.14",
     "eslint": "^9.27.0",
     "eslint-plugin-format": "^1.0.1",
     "husky": "^9.1.7",
@@ -39,12 +42,14 @@
     "yaml": "^2.8.0"
   },
   "dependencies": {
+    "@yankeeinlondon/is-monorepo": "1.0.0-alpha.1",
     "@yankeeinlondon/kind-error": "^1.2.2",
+    "@yankeeinlondon/package-json": "1.0.0-alpha.1",
     "chalk": "^5.4.1",
     "fast-glob": "^3.3.3",
     "inferred-types": "^0.55.23",
+    "repo-root": "1.0.0-alpha.4",
     "simple-git": "^3.27.0",
-    "superjson": "^2.2.2",
     "ts-morph": "^26.0.0"
   }
 }
