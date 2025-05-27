@@ -1,5 +1,6 @@
 import type {
-    AnyFunction, Dictionary,
+    AnyFunction,
+    Dictionary,
     FnProps,
     LiteralFn,
     MergeObjects,
@@ -8,12 +9,11 @@ import type {
     TypedFunction,
 } from "inferred-types";
 
-
 type FnWithProps<
     TFn extends TypedFunction,
     TProps extends Record<ObjectKey, Narrowable>,
     TNarrowing extends boolean,
-    Fn extends <A extends Parameters<TFn>>(...args: A) => ReturnType<TFn> = <A extends Parameters<TFn>>(...args: A) => ReturnType<TFn>
+    Fn extends <A extends Parameters<TFn>>(...args: A) => ReturnType<TFn> = <A extends Parameters<TFn>>(...args: A) => ReturnType<TFn>,
 > = TNarrowing extends true
     ? Fn & MergeObjects<FnProps<TFn>, TProps>
     : LiteralFn<Fn> & MergeObjects<FnProps<TFn>, TProps>;
@@ -39,7 +39,6 @@ export function fnProps<T extends AnyFunction>(fn: T) {
     return props as FnProps<T>;
 }
 
-
 /**
  * **createFnWithProps**`(fn, props)`
  *
@@ -61,12 +60,12 @@ export function createFnWithProps<
 >(
     fn: TFn,
     props: TProps,
-    _narrowing: TNarrowing = false as TNarrowing
+    _narrowing: TNarrowing = false as TNarrowing,
 ) {
     let fnWithProps: any = fn;
     const p = {
         ...(fnProps(fn)),
-        ...props
+        ...props,
     };
     for (const prop of Object.keys(p)) {
         if (prop !== "name") {
@@ -78,8 +77,8 @@ export function createFnWithProps<
         fnWithProps = Object.defineProperties(fnWithProps, {
             name: {
                 value: p.name,
-                writable: false
-            }
+                writable: false,
+            },
         });
     }
 

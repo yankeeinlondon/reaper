@@ -1,14 +1,15 @@
-import { Symbol, TypeChecker } from "ts-morph";
-import { FnVariant, FunctionReturn } from "~/types";
+import type { Symbol, TypeChecker } from "ts-morph";
+import type { FnVariant, FunctionReturn } from "~/types";
 import { isFunctionVariant } from "~/type-guards";
 
 export function getFunctionReturn(
     sym: Symbol,
-    options?: { fnVariant?: FnVariant | false; checker?: TypeChecker }
+    options?: { fnVariant?: FnVariant | false; checker?: TypeChecker },
 ): FunctionReturn {
     const type = options?.fnVariant || isFunctionVariant(sym);
     const decl = sym.getDeclarations()[0];
-    if (!decl) return { type: "unknown" };
+    if (!decl)
+        return { type: "unknown" };
     const checker = options?.checker;
 
     // Helper to extract return type from a callable signature
@@ -16,7 +17,7 @@ export function getFunctionReturn(
         const effectiveChecker = checker || decl.getSourceFile().getProject().getTypeChecker();
         return {
             type: effectiveChecker.getTypeText(signature.getReturnType()),
-            jsDocs: []
+            jsDocs: [],
         };
     }
 

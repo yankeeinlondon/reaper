@@ -1,28 +1,27 @@
+import type { Diagnostic, SourceFile } from "ts-morph";
+import type { DiagnosticLevel, FileDiagnostic } from "~/types";
 import { isString, Never } from "inferred-types";
-import { Diagnostic, DiagnosticCategory, SourceFile, ts } from "ts-morph";
-import { isSourceFile, isTsDiagnostic } from "~/type-guards";
-import { DiagnosticLevel, FileDiagnostic } from "~/types";
+import { DiagnosticCategory, ts } from "ts-morph";
 import { DiagnosticError, InvalidFilepath } from "~/errors";
+import { displayDiagnostic } from "~/report";
+import { isSourceFile, isTsDiagnostic } from "~/type-guards";
 import { asFileRef } from "../files";
-import { displayDiagnostic, displayFile } from "~/report";
-
 
 /**
  * **asFileDiagnostic**`(diag)`
- * 
- * Takes a `Diagnostic` from **ts-morph** and summarizes to 
+ *
+ * Takes a `Diagnostic` from **ts-morph** and summarizes to
  * a _serializable_ `FileDiagnostic`.
  */
 function asFileDiagnostic(
     diagnostic: Diagnostic<ts.Diagnostic>,
-    opts: { filepath?: string } = {}
+    opts: { filepath?: string } = {},
 ): FileDiagnostic {
     const filepath = opts.filepath || diagnostic.getSourceFile()?.getFilePath().toString();
 
     const code = isTsDiagnostic(diagnostic)
         ? diagnostic.code
         : diagnostic.getCode();
-
 
     const msg = isTsDiagnostic(diagnostic)
         ? isString(diagnostic.messageText)
@@ -32,11 +31,9 @@ function asFileDiagnostic(
                 : "UNKNOWN"
         : String(diagnostic.getMessageText());
 
-
-    if(!filepath) {
+    if (!filepath) {
         throw InvalidFilepath(`Unresolvable filepath in diagnostic passed to asFileDiagnostic()`, { diagnostic: msg, code });
     }
-
 
     const category = isTsDiagnostic(diagnostic)
         ? diagnostic.category
@@ -49,7 +46,7 @@ function asFileDiagnostic(
                 ? "suggestion"
                 : category === DiagnosticCategory.Message
                     ? "message"
-                    : Never
+                    : Never;
 
     const start = isTsDiagnostic(diagnostic)
         ? diagnostic.start
@@ -61,7 +58,7 @@ function asFileDiagnostic(
         ? { line: start || 0, character: length || 0 }
         : ts.getLineAndCharacterOfPosition(
             (diagnostic.getSourceFile() as SourceFile).compilerNode,
-            diagnostic.getStart() || 0
+            diagnostic.getStart() || 0,
         );
 
     const payload: FileDiagnostic = {
@@ -73,28 +70,24 @@ function asFileDiagnostic(
             lineNumber: line + 1,
             column: character + 1,
             start,
-            length
+            length,
         },
         toString() {
-            return displayDiagnostic(this, { format: "text"})
+            return displayDiagnostic(this, { format: "text" });
         },
         toConsole() {
-            return displayDiagnostic(this, {format: "console"})
+            return displayDiagnostic(this, { format: "console" });
         },
         toJSON() {
             return JSON.stringify(this);
         },
         toError() {
-            return DiagnosticError(msg, { filepath, level, code })
-        }
+            return new DiagnosticError(msg, { filepath, level, code });
+        },
     };
 
-    return payload
+    return payload;
 };
-
-
-
-
 
 /**
  * Takes raw `Diagnostic` data to `FileDiagnostic` data
@@ -102,22 +95,24 @@ function asFileDiagnostic(
  * information.
  */
 export function getFileDiagnostics(
-    files: SourceFile[] | Diagnostic[]
+    files: SourceFile[] | Diagnostic[],
 ): FileDiagnostic[] {
     const diagnostics: FileDiagnostic[] = [];
 
     if (files.length === 0) {
-        return []
-    } else if (isSourceFile(files[0])) {
+        return [];
+    }
+    else if (isSourceFile(files[0])) {
         for (const file of (files as SourceFile[])) {
             const diag = file.getPreEmitDiagnostics();
             const fd = diag.map(d => asFileDiagnostic(d));
             diagnostics.push(...fd);
         }
-    } else {
+    }
+    else {
         const diag = files as Diagnostic[];
         for (const d of diag) {
-            diagnostics.push(asFileDiagnostic(d))
+            diagnostics.push(asFileDiagnostic(d));
         }
     }
 
@@ -128,7 +123,7 @@ export function getFileDiagnostics(
  * Get diagnostics for the source files passed in.
  */
 export function getDiagnostics(
-    files: SourceFile[]
+    files: SourceFile[],
 ): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
 

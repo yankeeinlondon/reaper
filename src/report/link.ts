@@ -1,10 +1,10 @@
-type Link = 
-| `http://${string}` 
-| `https://${string}`
-| `file://${string}`
-| `mailto:${string}@${string}`
-| `tel:${string}`
-| `sms:${string}`;
+type Link =
+    | `http://${string}`
+    | `https://${string}`
+    | `file://${string}`
+    | `mailto:${string}@${string}`
+    | `tel:${string}`
+    | `sms:${string}`;
 
 /**
  * **link**`(text, link)`
@@ -17,9 +17,9 @@ type Link =
  * - `file` (note format is `file://hostname/path/to/file.txt` and hostname
  * IS required)
  * - `mailto`
- * 
+ *
  * Terminal app support includes:
- * 
+ *
  * - [WezTerm](https://wezterm.org/escape-sequences.html)
  * - [iTerm2](https://iterm2.com/documentation-escape-codes.html) (macOS, since v3.3.0)
  * - Windows Terminal (since v1.6)
@@ -35,6 +35,5 @@ type Link =
  * - Xfce Terminal (since v0.9.0)
  */
 export function link(text: string, link: Link) {
-  return `\x1B]8;;${link}\x1B\\${text}\x1B]8;;\x1B\\`;
+    return `\x1B]8;;${link}\x1B\\${text}\x1B]8;;\x1B\\`;
 }
-

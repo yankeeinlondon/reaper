@@ -1,5 +1,5 @@
-import { Symbol } from "ts-morph";
-import {
+import type { Symbol } from "ts-morph";
+import type {
     ClassMethod,
     ExportType,
     FnVariant,
@@ -11,7 +11,7 @@ import {
     SymbolFlagKey,
     SymbolRef,
     SymbolScope,
-    SymbolType
+    SymbolType,
 } from "~/types";
 
 export type AstKind =
@@ -45,51 +45,49 @@ export type KindSpecific<K extends AstKind> = K extends "function"
         returnType: FunctionReturn;
     }
     : K extends "class"
-    ? {
-        extends: SymbolRef[];
-        isAbstract: boolean;
+        ? {
+            extends: SymbolRef[];
+            isAbstract: boolean;
 
-        
-        /** the signature of the class's constructor */
-        constructor?: ClassMethod;
+            /** the signature of the class's constructor */
+            constructor?: ClassMethod;
 
-        /**
-         * Static methods provided on the class definition
-         */
-        staticMethods: ClassMethod[];
-        /**
-         * Instance methods available on an instance of the class.
-         */
-        methods: ClassMethod[];
+            /**
+             * Static methods provided on the class definition
+             */
+            staticMethods: ClassMethod[];
+            /**
+             * Instance methods available on an instance of the class.
+             */
+            methods: ClassMethod[];
 
-    }
-    : K extends "type"
-    ? {
-    } 
-    : K extends "type-utility"
-    ? {
-    }
-    : K extends "variable"
-    ? {
-        /** the _scope_ which the variable was declared with */
-        varScope: "let" | "const" | "var";
-    }
-    :{};
+        }
+        : K extends "type"
+            ? {
+            }
+            : K extends "type-utility"
+                ? {
+                }
+                : K extends "variable"
+                    ? {
+                        /** the _scope_ which the variable was declared with */
+                        varScope: "let" | "const" | "var";
+                    }
+                    : {};
 
 export type ScopeSpecific<S extends SymbolScope> = S extends "external"
     ? {
         /** information about the external source */
-        externalSource: PackageJson
+        externalSource: PackageJson;
     }
     : {};
 
-
-export type SymbolMeta__Base<
+export interface SymbolMeta__Base<
     K extends AstKind = AstKind,
-    S extends SymbolScope = SymbolScope
-> = {
+    S extends SymbolScope = SymbolScope,
+> {
     __kind: "SymbolMeta";
-    
+
     symbol: Symbol;
     /**
      * A string reference which maintains a `1:1` relationship
@@ -111,7 +109,7 @@ export type SymbolMeta__Base<
     type: SymbolType;
 
     /**
-     * A broad categorization for 
+     * A broad categorization for
      */
     astKind: K;
 
@@ -126,12 +124,12 @@ export type SymbolMeta__Base<
     scope: S;
 
     /** symbol name */
-    name: string,
+    name: string;
 
     /** fully qualified name */
-    fqn: string,
+    fqn: string;
 
-    /** 
+    /**
      * The file path to the function's definition
      */
     filepath: string;
@@ -140,19 +138,20 @@ export type SymbolMeta__Base<
 
     /**
      * The JSDocs comments for the symbol as a whole
-     * 
+     *
      * - does not include comments found for component parts of
      * the symbol
      */
     jsDocs: JsDocInfo[];
 
-    /** 
+    /**
      * `SymbolFlags` keys associated with the symbol
      */
     flags: SymbolFlagKey[];
 
-    /** 
-     * the epoch date of when this symbol was last changed in file system */
+    /**
+     * the epoch date of when this symbol was last changed in file system
+     */
     updated: EpochTimeStamp;
 
     startLine: number;
@@ -161,26 +160,25 @@ export type SymbolMeta__Base<
     /**
      * Get's the full text for the symbol
      */
-    getText(includeJsDocComments?: boolean): string;
+    getText: (includeJsDocComments?: boolean) => string;
 
     /**
      * Make the data structure _serialiable_ and then stringify
      * it into JSON format.
      */
-    toJSON(): string;
+    toJSON: () => string;
     /**
      * Produce a concise textual description of the symbol.
      */
-    toString(): string;
+    toString: () => string;
     /**
      * Similar to `toString()` but with ANSI escape sequences
      * for color and formatting appropriate for a terminal console.
      */
-    toConsole(): string;
+    toConsole: () => string;
 }
-
 
 export type SymbolMeta<
     K extends AstKind = AstKind,
-    S extends SymbolScope = SymbolScope
-> = SymbolMeta__Base<K,S> & KindSpecific<K> & ScopeSpecific<S>
+    S extends SymbolScope = SymbolScope,
+> = SymbolMeta__Base<K, S> & KindSpecific<K> & ScopeSpecific<S>;

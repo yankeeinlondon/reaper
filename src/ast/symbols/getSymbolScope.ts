@@ -1,11 +1,11 @@
-import { Symbol } from "ts-morph";
-import { SymbolScope } from "~/types";
+import type { Symbol } from "ts-morph";
+import type { SymbolScope } from "~/types";
 import { getExportType } from "~/type-guards";
 import { getSymbolKind } from "../utils";
 
 /**
  * Determines the scope of the given symbol.
- * 
+ *
  * Returns:
  *  - `local` if the symbol is defined locally and not exported,
  *  - `module` if the symbol is defined and exported within the scope of
@@ -17,10 +17,10 @@ export function getSymbolScope(symbol: Symbol): SymbolScope {
 
     // If there are no declarations, it's likely an external symbol
     if (
-        declarations.length === 0 ||
-        getSymbolKind(symbol) === "external-type"
+        declarations.length === 0
+    || getSymbolKind(symbol) === "external-type"
     ) {
-        return 'external';
+        return "external";
     }
 
     // Check if the symbol is declared in an external library
@@ -28,14 +28,13 @@ export function getSymbolScope(symbol: Symbol): SymbolScope {
     const sourceFile = firstDeclaration.getSourceFile();
 
     if (sourceFile.isInNodeModules()) {
-        return 'external';
+        return "external";
     }
 
-
     if (getExportType(symbol)) {
-        return 'module';
+        return "module";
     }
 
     // If not exported and not from an external library, it's local
-    return 'local';
+    return "local";
 }

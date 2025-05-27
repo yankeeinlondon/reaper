@@ -12,4 +12,3 @@ export * from "./getTypeChecker";
 export * from "./getTypeDeps";
 export * from "./isTypeSymbol";
 export * from "./isVariableSymbol";
-

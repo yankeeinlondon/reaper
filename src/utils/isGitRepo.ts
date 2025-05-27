@@ -1,5 +1,6 @@
-import simpleGit, { SimpleGit } from "simple-git";
-import { MAX_CONCURRENT_PROCESSES, getRoot } from "~/constants";
+import type { SimpleGit } from "simple-git";
+import simpleGit from "simple-git";
+import { getRoot, MAX_CONCURRENT_PROCESSES } from "~/constants";
 import { repoRoot } from "./repoRoot";
 
 /**
@@ -11,8 +12,8 @@ export async function isGitRepo(filepath?: string): Promise<SimpleGit | false> {
     const git = simpleGit(
         filepath ? repoRoot(filepath) : getRoot(),
         {
-            maxConcurrentProcesses: MAX_CONCURRENT_PROCESSES
-        }
+            maxConcurrentProcesses: MAX_CONCURRENT_PROCESSES,
+        },
     );
 
     const isRepo = await git.checkIsRepo();

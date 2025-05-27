@@ -1,15 +1,12 @@
-import { Diagnostic, DiagnosticCategory, SourceFile } from "ts-morph";
-import { DiagnosticError } from "~/errors";
-import { PackageJson } from "inferred-types";
-import { SymbolRef } from "./reference-types";
-import { FILE_REF_PREFIX } from "~/constants";
-import { DiagRef } from "./diagnostic-types";
+import type { PackageJson } from "inferred-types";
+import type { SourceFile } from "ts-morph";
+import type { DiagRef } from "./diagnostic-types";
+import type { SymbolRef } from "./reference-types";
+import type { FILE_REF_PREFIX } from "~/constants";
 
+export type FileRef = `${typeof FILE_REF_PREFIX}${string}`;
 
-export type FileRef = `${typeof FILE_REF_PREFIX}${string}`
-
-
-export type InternalSymbolImport = {
+export interface InternalSymbolImport {
     __kind: "SymbolImport";
     source: "internal";
     symbol: SymbolRef;
@@ -17,7 +14,7 @@ export type InternalSymbolImport = {
     definedIn: SourceFile;
 }
 
-export type ExternalSymbolImport = {
+export interface ExternalSymbolImport {
     __kind: "SymbolImport";
     source: "external";
     symbol: SymbolRef;
@@ -26,14 +23,13 @@ export type ExternalSymbolImport = {
 
 export type SymbolImport = InternalSymbolImport | ExternalSymbolImport;
 
-
 /**
  * **FileLookup**
- * 
+ *
  * Keys are relative filenames (from repo root or PWD if not repo),
  * values are the symbols which are found in the given file.
  */
-export type FileLookup = {
+export interface FileLookup {
     /** a hash of the last-updated date along with file contents */
     baseHash: number;
     /**
@@ -46,12 +42,10 @@ export type FileLookup = {
     symbols: ReadonlyMap<string, number>;
 }
 
-
-
 /**
  * cached metadata for source files
  */
-export type FileMeta = {
+export interface FileMeta {
     __kind: "FileMeta";
     /** A reference to this `FileMeta` in the files cache */
     fileRef: FileRef;
@@ -81,7 +75,7 @@ export type FileMeta = {
      */
     importsHash: number;
     /**
-     * A hash which detects whether the symbols which are 
+     * A hash which detects whether the symbols which are
      * _defined_ on the page have changed but **not** whether
      * the definition itself has changed.
      */
@@ -99,9 +93,8 @@ export type FileMeta = {
     fileHash: number;
 
     /**
-     * helps to detect whether the textual content -- with edge 
+     * helps to detect whether the textual content -- with edge
      * whitespace trimmed -- has changed.
      */
     fileContentHash: number;
 }
-

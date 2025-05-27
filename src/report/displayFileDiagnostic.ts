@@ -1,8 +1,8 @@
-import { DisplayOpts, FileDiagnostic, FileMeta } from "~/types";
+import type { DisplayOpts, FileDiagnostic } from "~/types";
 
 export function displayDiagnostic(
     file: FileDiagnostic,
-    opts: DisplayOpts
+    opts: DisplayOpts,
 ) {
-    return ""
+    return "";
 }

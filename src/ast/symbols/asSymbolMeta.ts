@@ -1,47 +1,43 @@
-import { Symbol,  TypeChecker } from "ts-morph";
-import { AstKind, KindSpecific, PackageJson,  SymbolMeta, SymbolMeta__Base } from "~/types";
-import { 
+import type { Symbol, TypeChecker } from "ts-morph";
+import type { KindSpecific, PackageJson, SymbolMeta, SymbolMeta__Base } from "~/types";
+import { statSync } from "node:fs";
+import {
     addSymbolsToCache,
     classExtends,
     createRefForSymbol,
     getAstKind,
     getClassMethods,
     getConstructor,
-    getExternalSource, 
-    getFunctionParameters, 
-    getFunctionReturn, 
-    getJsDocInfo, 
-    getStaticMethods, 
-    getSymbolFileDefinition, 
-    getSymbolFlags, 
-    getSymbolGenerics, 
+    getExternalSource,
+    getFunctionParameters,
+    getFunctionReturn,
+    getJsDocInfo,
+    getStaticMethods,
+    getSymbolFileDefinition,
+    getSymbolFlags,
+    getSymbolGenerics,
     getSymbolScope,
     getType,
     getTypeChecker,
     getVariableScope,
     isTypeSymbol,
     isTypeUtilitySymbol,
-    isVariableSymbol, 
+    isVariableSymbol,
 } from "~/ast";
-import { getExportType, isFunctionVariant, isFunctionMeta } from "~/type-guards";
-import { isClassDefinition } from "~/ast/classes/isClassDefinition";
 import { isAbstract } from "~/ast/classes/isAbstract";
-import {  statSync } from "node:fs";
-import {  Unexpected } from "~/errors";
+import { isClassDefinition } from "~/ast/classes/isClassDefinition";
+import { Unexpected } from "~/errors";
+import { displaySymbol } from "~/report";
+import { getExportType, isFunctionMeta, isFunctionVariant } from "~/type-guards";
 import { isClassMeta } from "~/type-guards/isClassMeta";
 import { isVariableMeta } from "~/type-guards/isVariableMeta";
-import { displaySymbol } from "~/report";
-
-
-
-
 
 /**
  * Converts a **ts-morph** `Symbol` into a `SymbolMeta`
  */
 export function asSymbolMeta(
     sym: Symbol,
-    opts: { checker?: TypeChecker } = {}
+    opts: { checker?: TypeChecker } = {},
 ): SymbolMeta {
     const flags = getSymbolFlags(sym);
     const checker = opts.checker ? opts.checker : getTypeChecker(sym);
@@ -50,7 +46,7 @@ export function asSymbolMeta(
 
     const isType: boolean = isTypeSymbol(sym);
     const isTypeUtility = isType && isTypeUtilitySymbol(sym, generics);
-    const isClass = !isType && isClassDefinition(sym, {checker})
+    const isClass = !isType && isClassDefinition(sym, { checker });
     const isVariable: boolean = !isType && isVariableSymbol(sym);
 
     const name = sym.getName();
@@ -60,51 +56,52 @@ export function asSymbolMeta(
     const scope = getSymbolScope(sym);
     const externalSource = (
         scope === "external"
-        ? getExternalSource(sym) || {}
-        : {} as PackageJson
+            ? getExternalSource(sym) || {}
+            : {} as PackageJson
     );
 
     const jsDocs = getJsDocInfo(sym);
-    
 
     const {
         filepath,
         startLine,
-        endLine
+        endLine,
     } = getSymbolFileDefinition(sym);
 
     const exportType = getExportType(sym);
 
     const updated = statSync(filepath).ctimeMs as EpochTimeStamp;
-    const astKind = getAstKind(sym, {exportType,scope});
+    const astKind = getAstKind(sym, { exportType, scope });
 
     /**
      * Hash to be used for "freshness" testing
      */
-    const timingHash = createRefForSymbol(sym,{
+    const timingHash = createRefForSymbol(sym, {
         astKind,
         filepath,
         scope,
-        updated
+        updated,
     });
 
     /**
      * Hash intended to statically create a `1:1` map to a
      * `Symbol`.
      */
-    const identityHash = createRefForSymbol(sym,{
+    const identityHash = createRefForSymbol(sym, {
         astKind,
         filepath,
-        scope
+        scope,
     });
     const ref = createRefForSymbol(
-            sym, {astKind,filepath,scope}
-        );
+        sym,
+        { astKind, filepath, scope },
+    );
     const hash = createRefForSymbol(
-            sym, {astKind,filepath,scope,updated}
-        )
+        sym,
+        { astKind, filepath, scope, updated },
+    );
 
- const base: SymbolMeta__Base = {
+    const base: SymbolMeta__Base = {
         __kind: "SymbolMeta",
         symbol: sym,
         astKind,
@@ -126,63 +123,59 @@ export function asSymbolMeta(
         getText: sym.getDeclarations()[0].getText,
 
         toJSON() {
-            return JSON.stringify(this)
+            return JSON.stringify(this);
         },
         toConsole() {
-            return displaySymbol(sym, {checker, format: "console"})
+            return displaySymbol(sym, { checker, format: "console" });
         },
         toString() {
-            return displaySymbol(sym, {checker, format: "text"})
+            return displaySymbol(sym, { checker, format: "text" });
         },
-    }
+    };
 
     if (isFunctionMeta(base)) {
         const fnVariant = isFunctionVariant(sym);
         if (!fnVariant) {
-            throw Unexpected(`getFunctionVariant() was unable to determine what variant type the function was but the symbol HAS been determined to BE a function!`, )
+            throw Unexpected(`getFunctionVariant() was unable to determine what variant type the function was but the symbol HAS been determined to BE a function!`);
         }
-
 
         const fn = {
             fnVariant,
-            parameters: getFunctionParameters(sym, {fnVariant, checker}),
-            returnType: getFunctionReturn(sym, {fnVariant, checker})
+            parameters: getFunctionParameters(sym, { fnVariant, checker }),
+            returnType: getFunctionReturn(sym, { fnVariant, checker }),
         } satisfies KindSpecific<"function">;
 
         return {
             ...base,
-            ...fn
-        } as SymbolMeta<"function">
+            ...fn,
+        } as SymbolMeta<"function">;
     }
-
 
     if (isClassMeta(base)) {
         const classy = {
             extends: addSymbolsToCache(classExtends(sym)).map(i => i.ref),
-            constructor: getConstructor(sym, {checker}),
-            methods: getClassMethods(sym, {checker}),
-            staticMethods: getStaticMethods(sym, {checker}),
+            constructor: getConstructor(sym, { checker }),
+            methods: getClassMethods(sym, { checker }),
+            staticMethods: getStaticMethods(sym, { checker }),
             isAbstract: isAbstract(sym),
         } satisfies KindSpecific<"class">;
 
         return {
             ...base,
-            ...classy
-        } as SymbolMeta<"class">
+            ...classy,
+        } as SymbolMeta<"class">;
     }
 
     if (isVariableMeta(base)) {
         const info = {
-            varScope: getVariableScope(sym)
-        }
+            varScope: getVariableScope(sym),
+        };
 
         return {
             ...base,
-            ...info
-        } as SymbolMeta<"variable">
+            ...info,
+        } as SymbolMeta<"variable">;
     }
 
     return base as SymbolMeta<"other">;
 }
-
-

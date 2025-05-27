@@ -1,7 +1,7 @@
-import { SourceFile } from "ts-morph";
+import type { SourceFile } from "ts-morph";
 
 export function getFileExports(
-    file: SourceFile
+    file: SourceFile,
 ) {
-    
+
 }

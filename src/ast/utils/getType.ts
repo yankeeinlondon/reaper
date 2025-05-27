@@ -1,5 +1,5 @@
-import { Symbol, Type } from "ts-morph";
-import { SymbolType } from "~/types";
+import type { Symbol, Type } from "ts-morph";
+import type { SymbolType } from "~/types";
 
 // Overload signatures
 export function getType(sym: Symbol): SymbolType;
@@ -24,9 +24,10 @@ export function getType(input: Symbol | Type): SymbolType {
             isContainer: dt.isArray() || dt.isObject(),
             isReadonlyArray: dt.isReadonlyArray(),
             parts,
-            literalValue: parts.map(p => p.literalValue).filter(v => v !== undefined && v !== null)
+            literalValue: parts.map(p => p.literalValue).filter(v => v !== undefined && v !== null),
         };
-    } else if (dt.isIntersection && dt.isIntersection()) {
+    }
+    else if (dt.isIntersection && dt.isIntersection()) {
         const parts = dt.getIntersectionTypes().map(i => getType(i));
         return {
             kind: "intersection",
@@ -36,12 +37,13 @@ export function getType(input: Symbol | Type): SymbolType {
             isContainer: dt.isArray() || dt.isObject(),
             isReadonlyArray: dt.isReadonlyArray(),
             parts,
-            literalValue: parts.map(p => p.literalValue).filter(v => v !== undefined && v !== null)
+            literalValue: parts.map(p => p.literalValue).filter(v => v !== undefined && v !== null),
         };
-    } else {
+    }
+    else {
         const isLiteral = dt.isLiteral();
-        let literalValue: any = undefined;
-        if (isLiteral && typeof dt.getLiteralValue === 'function') {
+        let literalValue: any;
+        if (isLiteral && typeof dt.getLiteralValue === "function") {
             literalValue = dt.getLiteralValue();
         }
         return {
@@ -51,7 +53,7 @@ export function getType(input: Symbol | Type): SymbolType {
             isContainer: dt.isArray() || dt.isObject(),
             isReadonlyArray: dt.isReadonlyArray(),
             text: dt.getText(),
-            literalValue
+            literalValue,
         };
     }
 }

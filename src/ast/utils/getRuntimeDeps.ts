@@ -1,20 +1,20 @@
-import { Symbol, TypeChecker } from "ts-morph";
+import type { Symbol, TypeChecker } from "ts-morph";
+import type { SymbolRef } from "~/types";
 import { isSymbol } from "inferred-types";
-import { 
-    addSymbolsToCache, 
+import {
+    addSymbolsToCache,
     getSymbol,
-    isClassInstance,
     isClassDefinition,
-    isVariableSymbol
- } from "~/ast"
+    isClassInstance,
+    isVariableSymbol,
+} from "~/ast";
+import { isFunctionVariant } from "~/type-guards";
 import { getTypeChecker } from "./getTypeChecker";
-import { SymbolRef } from "~/types";
-import { isFunctionVariant,  } from "~/type-guards";
 
 /**
  * Get's the _run-time_ dependencies that the
- * passed in `Symbol` has. 
- * 
+ * passed in `Symbol` has.
+ *
  * - returns a tuple of `SymbolRef`'s which point
  * to these symbols.
  * - any new Symbols uncovered during execution are
@@ -22,7 +22,7 @@ import { isFunctionVariant,  } from "~/type-guards";
  */
 export function getRuntimeDeps(
     sym: Symbol,
-    opts?: { checker: TypeChecker }
+    opts?: { checker: TypeChecker },
 ): SymbolRef[] {
     const checker = opts?.checker || getTypeChecker(sym);
     const meta = addSymbolsToCache(sym, { checker });
@@ -30,15 +30,17 @@ export function getRuntimeDeps(
 
     for (const decl of sym.getDeclarations()) {
         decl.forEachDescendant((node) => {
-            if (!node || typeof node.getSymbol !== "function") return;
+            if (!node || typeof node.getSymbol !== "function")
+                return;
             const refSym = getSymbol(node);
-            if (!isSymbol(refSym)) return;
+            if (!isSymbol(refSym))
+                return;
 
             if (
-                isFunctionVariant(refSym) ||
-                isClassDefinition(refSym, { checker }) ||
-                isClassInstance(refSym, { checker }) ||
-                isVariableSymbol(refSym)
+                isFunctionVariant(refSym)
+        || isClassDefinition(refSym, { checker })
+        || isClassInstance(refSym, { checker })
+        || isVariableSymbol(refSym)
             ) {
                 const ref = addSymbolsToCache(refSym, { checker });
                 runtimeDeps.add(ref.ref);

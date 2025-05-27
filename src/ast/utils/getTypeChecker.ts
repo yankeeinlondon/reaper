@@ -1,7 +1,6 @@
-import { Project, Symbol, TypeChecker } from "ts-morph";
+import type { Project, Symbol, TypeChecker } from "ts-morph";
+import type { SymbolMeta } from "~/types";
 import { isSymbol, isSymbolMeta } from "~/type-guards";
-import { SymbolMeta } from "~/types";
-
 
 /**
  * Provides the **ts-morph** `TypeChecker` from either

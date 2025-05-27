@@ -1,8 +1,8 @@
-import { Symbol, TypeChecker } from "ts-morph";
+import type { Symbol, TypeChecker } from "ts-morph";
 
 export function isClassDefinition(
-    sym: Symbol, 
-    options?: { checker?: TypeChecker }
+    sym: Symbol,
+    options?: { checker?: TypeChecker },
 ): boolean {
     for (const d of sym.getDeclarations()) {
         if (d.getKindName() === "ClassDeclaration") {
@@ -23,10 +23,9 @@ export function isClassDefinition(
     return false;
 }
 
-
 export function isClassInstance(
-    sym: Symbol, 
-    options?: { checker?: TypeChecker }
+    sym: Symbol,
+    options?: { checker?: TypeChecker },
 ): boolean {
     const checker = options?.checker;
     const decl = sym.getDeclarations()[0];

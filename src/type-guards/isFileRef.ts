@@ -1,5 +1,5 @@
+import type { FileRef } from "~/types";
 import { isString } from "inferred-types";
-import { FileRef } from "~/types";
 
 /**
  * type guard which validates that `val` is a `FileRef`

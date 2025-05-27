@@ -1,20 +1,22 @@
-import { 
-    Symbol, 
-    SymbolFlags, 
-    SyntaxKind, 
-    VariableDeclaration 
+import type {
+    Symbol,
+    VariableDeclaration,
+} from "ts-morph";
+import type { SymbolKind } from "~/types";
+import {
+    SymbolFlags,
+    SyntaxKind,
 } from "ts-morph";
 import { hasSomeSymbolFlags } from "~/type-guards";
-import { SymbolKind } from "~/types";
 
 /**
  * categorizes a **ts-morph** `Symbol` into a broad category defined
  * by the `SymbolKind` type alias.
- * 
+ *
  * @deprecated this will likely be removed in favor of using only
  * `AstKind` and the `getAstKind()` utility.
  */
-export const getSymbolKind = (symbol: Symbol): SymbolKind => {
+export function getSymbolKind(symbol: Symbol): SymbolKind {
     const sym = symbol.getAliasedSymbol() || symbol;
     const declarations = sym.getDeclarations();
     const valueDeclaration = sym.getValueDeclaration();
@@ -33,13 +35,13 @@ export const getSymbolKind = (symbol: Symbol): SymbolKind => {
             SymbolFlags.TypeLiteral,
             SymbolFlags.Interface,
             SymbolFlags.TypeParameter,
-            SymbolFlags.TypeAliasExcludes
-        ) ||
-        declarations.some(decl =>
-            decl.getKind() === SyntaxKind.TypeAliasDeclaration ||
-            decl.getKind() === SyntaxKind.InterfaceDeclaration ||
-            decl.getKind() === SyntaxKind.TypeReference
+            SymbolFlags.TypeAliasExcludes,
         )
+    || declarations.some(decl =>
+        decl.getKind() === SyntaxKind.TypeAliasDeclaration
+      || decl.getKind() === SyntaxKind.InterfaceDeclaration
+      || decl.getKind() === SyntaxKind.TypeReference,
+    )
     ) {
         return "type-defn";
     }
@@ -50,11 +52,11 @@ export const getSymbolKind = (symbol: Symbol): SymbolKind => {
             sym,
             SymbolFlags.TypeParameter,
             SymbolFlags.TypeParameterExcludes,
-            SymbolFlags.Type
-        ) ||
-        declarations.some(decl =>
-            decl.getKind() === SyntaxKind.TypeParameter
+            SymbolFlags.Type,
         )
+    || declarations.some(decl =>
+        decl.getKind() === SyntaxKind.TypeParameter,
+    )
     ) {
         return "type-constraint";
     }
@@ -62,7 +64,7 @@ export const getSymbolKind = (symbol: Symbol): SymbolKind => {
     // Check for function declarations
     if (
         declarations.some(decl =>
-            decl.getKind() === SyntaxKind.FunctionDeclaration
+            decl.getKind() === SyntaxKind.FunctionDeclaration,
         )
     ) {
         return "function";
@@ -70,8 +72,8 @@ export const getSymbolKind = (symbol: Symbol): SymbolKind => {
 
     // Check for const-function (variable with function initializer)
     if (
-        valueDeclaration &&
-        valueDeclaration.getKind() === SyntaxKind.VariableDeclaration
+        valueDeclaration
+    && valueDeclaration.getKind() === SyntaxKind.VariableDeclaration
     ) {
         const variableDecl = valueDeclaration as VariableDeclaration;
         const initializer = variableDecl.getInitializer();
@@ -85,10 +87,9 @@ export const getSymbolKind = (symbol: Symbol): SymbolKind => {
         hasSomeSymbolFlags(
             sym,
             SymbolFlags.Property,
-            SymbolFlags.PropertyExcludes
+            SymbolFlags.PropertyExcludes,
         )
     ) {
-
         return "property";
     }
 
@@ -98,11 +99,11 @@ export const getSymbolKind = (symbol: Symbol): SymbolKind => {
     }
 
     const symbolType = sym.getTypeAtLocation(
-        valueDeclaration || declarations[0]
+        valueDeclaration || declarations[0],
     );
 
     // Check if it's an instance of a class
-    if (symbolType.isObject() && symbolType.getSymbol()?.getName() !== 'Object') {
+    if (symbolType.isObject() && symbolType.getSymbol()?.getName() !== "Object") {
         const isInstance = symbolType.getSymbol()?.getDeclarations().some(decl => decl.getKind() === SyntaxKind.ClassDeclaration);
         if (isInstance) {
             return "instance";
@@ -120,13 +121,13 @@ export const getSymbolKind = (symbol: Symbol): SymbolKind => {
     }
 
     if (symbolType.isUnionOrIntersection()) {
-        return "union-or-intersection"
+        return "union-or-intersection";
     }
 
     // Check if it's a container (object, array, Map, Set, etc.)
     if (
-        symbolType.isObject() ||
-        symbolType.isArray()
+        symbolType.isObject()
+    || symbolType.isArray()
     ) {
         return "container";
     }

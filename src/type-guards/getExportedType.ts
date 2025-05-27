@@ -1,25 +1,25 @@
-import { Symbol, Node, SyntaxKind } from "ts-morph";
-import { ExportType } from "~/types";
-
+import type { Symbol } from "ts-morph";
+import type { ExportType } from "~/types";
+import { Node, SyntaxKind } from "ts-morph";
 
 function hasExportModifier(declaration: Node): boolean {
-    return Node.isModifierable(declaration) &&
-        declaration.getModifiers().some(mod =>
-            mod.getKind() === SyntaxKind.ExportKeyword
-        );
+    return Node.isModifierable(declaration)
+      && declaration.getModifiers().some(mod =>
+          mod.getKind() === SyntaxKind.ExportKeyword,
+      );
 }
 
 function hasDefaultModifier(declaration: Node): boolean {
-    return Node.isModifierable(declaration) &&
-        declaration.getModifiers().some(mod =>
-            mod.getKind() === SyntaxKind.DefaultKeyword
-        );
+    return Node.isModifierable(declaration)
+      && declaration.getModifiers().some(mod =>
+          mod.getKind() === SyntaxKind.DefaultKeyword,
+      );
 }
 
 /**
- * Checks whether the passed in `Symbol` is _exported_ and what 
+ * Checks whether the passed in `Symbol` is _exported_ and what
  * kind of export it is.
- * 
+ *
  * - `false` means it is **not exported**
  * - `named`, `default` and `re-exported` indicate the kind of
  * export that it is.
@@ -40,20 +40,24 @@ export function getExportType(symbol: Symbol): ExportType {
 
         // For variable declarations, check the parent VariableStatement
         if (Node.isVariableDeclaration(declaration) && parent && Node.isVariableStatement(parent)) {
-            if (hasDefaultModifier(parent)) return "default";
-            if (hasExportModifier(parent)) return "named";
+            if (hasDefaultModifier(parent))
+                return "default";
+            if (hasExportModifier(parent))
+                return "named";
         }
 
         // For other declarations, check for export/default keyword directly
         if (
-            Node.isFunctionDeclaration(declaration) ||
-            Node.isClassDeclaration(declaration) ||
-            Node.isInterfaceDeclaration(declaration) ||
-            Node.isEnumDeclaration(declaration) ||
-            Node.isTypeAliasDeclaration(declaration)
+            Node.isFunctionDeclaration(declaration)
+      || Node.isClassDeclaration(declaration)
+      || Node.isInterfaceDeclaration(declaration)
+      || Node.isEnumDeclaration(declaration)
+      || Node.isTypeAliasDeclaration(declaration)
         ) {
-            if (hasDefaultModifier(declaration)) return "default";
-            if (hasExportModifier(declaration)) return "named";
+            if (hasDefaultModifier(declaration))
+                return "default";
+            if (hasExportModifier(declaration))
+                return "named";
         }
     }
 

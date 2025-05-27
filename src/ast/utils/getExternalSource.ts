@@ -1,25 +1,26 @@
+import type { Symbol } from "ts-morph";
+import type { PackageJson } from "~/types";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { Symbol } from "ts-morph";
-import { PackageJson } from "~/types";
-
 
 /**
  * Returns the external package name and version for an external symbol,
  * or undefined if the symbol is not external or the package cannot be determined.
  */
 export function getExternalSource(
-    symbol: Symbol
+    symbol: Symbol,
 ): PackageJson | undefined {
     const declarations = symbol.getDeclarations();
-    if (declarations.length === 0) return undefined;
+    if (declarations.length === 0)
+        return undefined;
 
     for (const decl of declarations) {
         const sourceFile = decl.getSourceFile();
         const filePath = sourceFile.getFilePath();
 
         const nodeModulesIdx = filePath.lastIndexOf("node_modules");
-        if (nodeModulesIdx === -1) continue;
+        if (nodeModulesIdx === -1)
+            continue;
 
         // Handle @types packages
         const relPath = filePath.slice(nodeModulesIdx + "node_modules/".length);
@@ -28,11 +29,13 @@ export function getExternalSource(
         let pkgName: string;
         if (parts[0] === "@types" && parts.length > 1) {
             // e.g. node_modules/@types/lodash
-            pkgName = parts[0] + "/" + parts[1];
-        } else if (parts[0].startsWith("@") && parts.length > 1) {
+            pkgName = `${parts[0]}/${parts[1]}`;
+        }
+        else if (parts[0].startsWith("@") && parts.length > 1) {
             // e.g. node_modules/@scope/pkg
-            pkgName = parts[0] + "/" + parts[1];
-        } else {
+            pkgName = `${parts[0]}/${parts[1]}`;
+        }
+        else {
             pkgName = parts[0];
         }
 
@@ -45,7 +48,8 @@ export function getExternalSource(
                 const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf8"));
                 version = pkgJson.version;
             }
-        } catch {
+        }
+        catch {
             // Ignore errors, just omit version
         }
 

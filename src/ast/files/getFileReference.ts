@@ -1,25 +1,24 @@
-import { Diagnostic, SourceFile } from "ts-morph";
-import { isSourceFile } from "~/type-guards";
+import type { Diagnostic, SourceFile } from "ts-morph";
+import type { FileMeta, FileRef } from "~/types";
 import { isFileRef } from "~/type-guards/isFileRef";
-import { FileMeta, FileRef } from "~/types";
-import { getFilePath } from "./getFilePath";
 import { asFileRef } from "./file-cache";
+import { getFilePath } from "./getFilePath";
 
 /**
  * gets a `FileRef` from:
- * 
+ *
  * - `SourceFile`,
  * - `FileRef`,
  * - `FileMeta`,
  * - or `Diagnostic`
  */
 export function getFileReference(
-    source: SourceFile | FileRef | FileMeta | Diagnostic 
+    source: SourceFile | FileRef | FileMeta | Diagnostic,
 ): FileRef {
-    
-    if(isFileRef(source)) {
+    if (isFileRef(source)) {
         return source;
-    } else {
+    }
+    else {
         const filePath = getFilePath(source);
         const fileRef = asFileRef(filePath);
 

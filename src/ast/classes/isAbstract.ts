@@ -1,4 +1,5 @@
-import { Symbol, Node, SyntaxKind } from "ts-morph";
+import type { Symbol } from "ts-morph";
+import { Node, SyntaxKind } from "ts-morph";
 
 /**
  * Returns true if the symbol is a class or method and is marked as abstract.
@@ -6,8 +7,8 @@ import { Symbol, Node, SyntaxKind } from "ts-morph";
 export function isAbstract(sym: Symbol): boolean {
     for (const d of sym.getDeclarations()) {
         if (
-            (Node.isClassDeclaration(d) || Node.isMethodDeclaration(d)) &&
-            d.getModifiers().some(mod => mod.getKind() === SyntaxKind.AbstractKeyword)
+            (Node.isClassDeclaration(d) || Node.isMethodDeclaration(d))
+      && d.getModifiers().some(mod => mod.getKind() === SyntaxKind.AbstractKeyword)
         ) {
             return true;
         }

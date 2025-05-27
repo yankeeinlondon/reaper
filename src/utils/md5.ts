@@ -1,3 +1,4 @@
+import type { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 
 /**
@@ -5,6 +6,8 @@ import { createHash } from "node:crypto";
  * cryptographically secure way to hash data into a
  * hex based string value.
  */
-export function md5(data: string|Buffer): string {
-    return createHash('md5').update(data).digest("hex");
+export function md5(
+    data: string | Buffer,
+): string {
+    return createHash("md5").update(data).digest("hex");
 }

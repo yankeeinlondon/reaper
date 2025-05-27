@@ -1,6 +1,6 @@
-import { SYMBOL_REF_PREFIXES } from "~/constants"
-import { SymbolScope } from "./general";
-import { AstKind } from "./SymbolMeta";
+import type { SymbolScope } from "./general";
+import type { AstKind } from "./SymbolMeta";
+import type { SYMBOL_REF_PREFIXES } from "~/constants";
 
 export type ReferencePrefix = typeof SYMBOL_REF_PREFIXES[number];
 
@@ -10,9 +10,8 @@ export type ReferencePrefix = typeof SYMBOL_REF_PREFIXES[number];
 export type SymbolRef<
     K extends AstKind = AstKind,
     S extends SymbolScope = SymbolScope,
-    P extends string = string
-> = `${K}::${S}::${P}::${string}`
-
+    P extends string = string,
+> = `${K}::${S}::${P}::${string}`;
 
 /** reference to a function symbol */
 export type FunctionRef = SymbolRef<"function">;

@@ -1,12 +1,11 @@
-import {
+import type {
     JSDocLink,
     JSDocLinkCode,
     JSDocLinkPlain,
     JSDocText,
-    ts
+    ts,
 } from "ts-morph";
-import { SymbolScope, GenericType, FQN } from "./general";
-
+import type { FQN, GenericType, SymbolScope } from "./general";
 
 /**
  * The union type which represents all the _keys_ to the `ts.SymbolFlags` enumeration.
@@ -29,27 +28,26 @@ export type SymbolKind =
     | "const-function"
     | "other";
 
-
 /**
  * **symbolsMeta**
- * 
+ *
  * Key meta-data for a `Symbol` which is serializable
  * (unlike a **ts-morph** `Symbol`).
- * 
+ *
  * **Note:** this is the _type_ to use in the cache and is meant to
  * contain all relevant data on Symbols that this plugin would
  * want to report on.
  */
-export type SymbolsMeta<
-    TKind extends SymbolKind = SymbolKind
-> = {
+export interface SymbolsMeta<
+    TKind extends SymbolKind = SymbolKind,
+> {
     /** symbol name */
     name: string;
-    /** 
+    /**
      * The fully qualified name of the dependency aims to provide
      * a unique-assured token for caching and explicit referencing.
      * The scope of the symbol will depend on it's format:
-     * 
+     *
      * - a locally defined symbol within the repo being analyzed will look
      * like: `local::<filepath-hash>::<name>`
      * - an module you are exporting in the repo being analyzed will look
@@ -65,11 +63,11 @@ export type SymbolsMeta<
      */
     scope: SymbolScope;
 
-    externalSource?: {name: string, version?: string};
+    externalSource?: { name: string; version?: string };
 
     /**
      * The file path to the symbol's definition.
-     * 
+     *
      * **Note:** if the symbol is a "type" then this should always
      * be resolved but for some other _kinds_ of `Symbol` it is optional
      */
@@ -92,10 +90,10 @@ export type SymbolsMeta<
 
     startLine: TKind extends "type-defn" ? number : number | undefined;
     endLine: TKind extends "type-defn" ? number : number | undefined;
-    /** 
+    /**
      * The `symbol.getFlags()` returns a bitwise operation that
      * isn't very human intelligible; this reverse engineers the
-     * `SymbolFlags` enumeration keys which went into generating 
+     * `SymbolFlags` enumeration keys which went into generating
      * this number.
      */
     flags: SymbolFlagKey[];
@@ -115,33 +113,34 @@ export type SymbolsMeta<
 
     refs: SymbolReference[];
 
-    /** 
-     * the epoch date of when this symbol was last changed in file system */
+    /**
+     * the epoch date of when this symbol was last changed in file system
+     */
     updated: number;
 
     /** a screen-ready summary of the symbol */
-    toScreen(): string;
+    toScreen: () => string;
 
-    toJSON(): string;
-    toString(): string;
+    toJSON: () => string;
+    toString: () => string;
 }
 
 /**
  * an individual tag and tag comment
  */
-export type JsDocTag = {
+export interface JsDocTag {
     tagName: string;
     comment: string | (JSDocText | JSDocLink | JSDocLinkCode | JSDocLinkPlain | undefined)[] | undefined;
 }
 
-export type JsDocInfo = {
+export interface JsDocInfo {
     comment: string;
     tags: JsDocTag[];
 }
 
 export type SymbolTypeKind = "union" | "intersection" | "type";
 
-export type SymbolType<T extends SymbolTypeKind = SymbolTypeKind> = {
+export interface SymbolType<T extends SymbolTypeKind = SymbolTypeKind> {
     kind: T;
     /**
      * The Typescript type for the symbol
@@ -152,14 +151,14 @@ export type SymbolType<T extends SymbolTypeKind = SymbolTypeKind> = {
      */
     text: string;
 
-    /** 
+    /**
      * Is a literal type of `string`, `number`, or `boolean`
      */
     isLiteral: boolean;
 
     /**
      * The literal runtime value of the Symbol.
-     * 
+     *
      * - this is the _runtime_ equivalent to the `type`
      */
     literalValue?: any;
@@ -169,11 +168,11 @@ export type SymbolType<T extends SymbolTypeKind = SymbolTypeKind> = {
      */
     isContainer: boolean;
 
-    /** the Symbol is a **Readonly<Array<...>>** */
+    /** the Symbol is a **Readonly<Array<...>> */
     isReadonlyArray: boolean;
     /***
      * The constituant parts of a _union_ or _intersection_
      * type. Only present for union/intersection.
      */
     parts?: SymbolType[];
-};
+}

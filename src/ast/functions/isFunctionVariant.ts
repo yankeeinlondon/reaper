@@ -1,5 +1,5 @@
-import { Symbol, TypeChecker } from "ts-morph";
-import { FnVariant } from "~/types";
+import type { Symbol } from "ts-morph";
+import type { FnVariant } from "~/types";
 
 export type TryFunctionVariant = false | FnVariant;
 
@@ -8,10 +8,10 @@ export type TryFunctionVariant = false | FnVariant;
  * type and returns the `FnVariant` if it is, otherwise returns `false`.
  */
 export function isFunctionVariant(
-    sym: Symbol
+    sym: Symbol,
 ): TryFunctionVariant {
     for (const d of sym.getDeclarations()) {
-        // Named function: function foo() {}
+    // Named function: function foo() {}
         if (d.getKindName() === "FunctionDeclaration") {
             return "named-fn";
         }

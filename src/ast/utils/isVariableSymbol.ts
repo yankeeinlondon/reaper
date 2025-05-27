@@ -1,4 +1,4 @@
-import { Symbol } from "ts-morph";
+import type { Symbol } from "ts-morph";
 import { getSymbolFlags } from "./getSymbolFlags";
 
 /**
@@ -9,7 +9,6 @@ export function isVariableSymbol(sym: Symbol): boolean {
     const flags = getSymbolFlags(sym);
 
     return flags.includes("Variable")
-        || flags.includes("BlockScopedVariable")
-        || flags.includes("ConstEnum");
+      || flags.includes("BlockScopedVariable")
+      || flags.includes("ConstEnum");
 }
-

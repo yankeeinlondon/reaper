@@ -1,10 +1,10 @@
-import { Symbol, TypeChecker } from "ts-morph";
+import type { Symbol, TypeChecker } from "ts-morph";
+import type { DisplayOpts, OutputFormat, SymbolMeta } from "~/types";
+import { addSymbolsToCache } from "~/ast";
 import { getTypeChecker } from "~/ast/utils/getTypeChecker";
 import { isSymbolMeta } from "~/type-guards";
-import { DisplayOpts, OutputFormat, SymbolMeta } from "~/types";
-import { addSymbolsToCache } from "~/ast";
-import { KIND, NAME } from "./symbols";
 import { displayGenerics } from "./displayGenerics";
+import { KIND, NAME } from "./symbols";
 
 function isText(val: string): boolean {
     return val === "test";
@@ -12,100 +12,99 @@ function isText(val: string): boolean {
 
 export function displayClass(
     sym: SymbolMeta<"class">,
-    opts: DisplayOpts
+    opts: DisplayOpts,
 ): string {
     const format = opts.format || "text";
     const sClass = isText(format)
         ? "class"
-        : KIND("class")
+        : KIND("class");
     const sName = isText(format)
         ? sym.name
-        : NAME(sym.name)
+        : NAME(sym.name);
     const sGenerics = displayGenerics(sym, opts);
 
-    return `${sClass} ${sName}${sGenerics}`
+    return `${sClass} ${sName}${sGenerics}`;
 }
 
 export function displayFunction(
     sym: SymbolMeta<"function">,
-    opts: DisplayOpts
+    opts: DisplayOpts,
 ): string {
     const format = opts.format || "text";
     const keyword = sym.fnVariant === "arrow-fn"
         ? ``
         : sym.fnVariant === "named-fn"
-        ? `function`
-        : `function`;
+            ? `function`
+            : `function`;
 
     const sClass = isText(format)
         ? keyword
-        : KIND(keyword)
+        : KIND(keyword);
     const sName = isText(format)
         ? sym.name
-        : NAME(sym.name)
+        : NAME(sym.name);
 
-    return `${sClass} ${sName}`
+    return `${sClass} ${sName}`;
 }
 
 export function displayType(
     sym: SymbolMeta<"type">,
-    opts: DisplayOpts
+    opts: DisplayOpts,
 ): string {
-    return `type:${sym.scope}::${sym.name}`
+    return `type:${sym.scope}::${sym.name}`;
 }
 
 export function displayTypeUtility(
     sym: SymbolMeta<"type-utility">,
-    opts: DisplayOpts
+    opts: DisplayOpts,
 ): string {
-    return `utility:${sym.scope}::${sym.name}`
+    return `utility:${sym.scope}::${sym.name}`;
 }
 
 export function displayVariable(
     sym: SymbolMeta<"variable">,
-    opts: DisplayOpts
+    opts: DisplayOpts,
 ): string {
-    return `variable: ${sym.scope}::${sym.name}`
+    return `variable: ${sym.scope}::${sym.name}`;
 }
 
 export function displayReExport(
     sym: SymbolMeta<"re-export">,
-    opts: DisplayOpts
+    opts: DisplayOpts,
 ): string {
-    return `re-export: ${sym.scope}::${sym.name}`
+    return `re-export: ${sym.scope}::${sym.name}`;
 }
 
 export function displayOther(
     sym: SymbolMeta<"other">,
-    opts: DisplayOpts
+    opts: DisplayOpts,
 ): string {
-    return `other: ${sym.scope}::${sym.name}`
+    return `other: ${sym.scope}::${sym.name}`;
 }
-
 
 export function displaySymbol(
     sym: Symbol | SymbolMeta,
-    opts: { checker?: TypeChecker, format?: OutputFormat } = {}
+    opts: { checker?: TypeChecker; format?: OutputFormat } = {},
 ): string {
     const checker = opts.checker || getTypeChecker(sym);
     const meta = isSymbolMeta(sym)
         ? sym
-        : addSymbolsToCache(sym, {checker});
+        : addSymbolsToCache(sym, { checker });
 
-    switch(meta.astKind) {
+    switch (meta.astKind) {
         case "class":
-            return displayClass(meta  as SymbolMeta<"class">, opts);
+            return displayClass(meta as SymbolMeta<"class">, opts);
         case "function":
-            return displayFunction(meta  as SymbolMeta<"function">, opts);
+            return displayFunction(meta as SymbolMeta<"function">, opts);
         case "type":
             return displayType(meta as SymbolMeta<"type">, opts);
         case "type-utility":
-            return displayTypeUtility(meta  as SymbolMeta<"type-utility">, opts);
-        case "variable": 
+            return displayTypeUtility(meta as SymbolMeta<"type-utility">, opts);
+        case "variable":
             return displayVariable(meta as SymbolMeta<"variable">, opts);
         case "re-export":
-            return displayReExport(meta  as SymbolMeta<"re-export">, opts);
+            return displayReExport(meta as SymbolMeta<"re-export">, opts);
         case "other":
-            return displayOther(meta  as SymbolMeta<"other">, opts);
+            return displayOther(meta as SymbolMeta<"other">, opts);
     }
 }

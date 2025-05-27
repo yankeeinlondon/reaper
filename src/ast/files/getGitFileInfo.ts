@@ -1,20 +1,20 @@
-import { SourceFile } from "ts-morph";
-import { isSourceFile } from "~/type-guards";
-import { getFilePath } from "./getFilePath";
+import type { SourceFile } from "ts-morph";
+import type { FileRef } from "~/types";
 import { simpleGit } from "simple-git";
-import { MAX_CONCURRENT_PROCESSES, getRoot } from "~/constants";
-import { FileRef } from "~/types";
-import { asFileRef } from "./file-cache";
+import { getRoot, MAX_CONCURRENT_PROCESSES } from "~/constants";
+import { isSourceFile } from "~/type-guards";
 import { md5 } from "~/utils";
+import { asFileRef } from "./file-cache";
+import { getFilePath } from "./getFilePath";
 
-export type GitFileInfo = {
+export interface GitFileInfo {
     file: FileRef;
     isGitRepo: boolean;
     /** the last commit in which this file was updated */
     lastCommit: string | undefined;
 
-    /** 
-     * has the file been modified from the last commited version of 
+    /**
+     * has the file been modified from the last commited version of
      * the file?
      */
     isDirty: boolean;
@@ -30,48 +30,51 @@ export async function getGitFileInfo(file: SourceFile | string) {
     const git = simpleGit(
         getRoot(),
         {
-            maxConcurrentProcesses: MAX_CONCURRENT_PROCESSES
-        }
+            maxConcurrentProcesses: MAX_CONCURRENT_PROCESSES,
+        },
     );
 
     const isRepo = await git.checkIsRepo();
-    
-    if(isRepo) {
-        // Get last commit hash for this file
-        let lastCommit: string | undefined = undefined;
+
+    if (isRepo) {
+    // Get last commit hash for this file
+        let lastCommit: string | undefined;
         try {
             const log = await git.log({ file: resolvedFilepath, n: 1 });
             lastCommit = log.latest?.hash;
-        } catch {}
+        }
+        catch {}
 
         // Check if file is dirty (modified or staged)
         let isDirty = false;
         try {
             const status = await git.status([resolvedFilepath]);
             isDirty = status.modified.includes(resolvedFilepath) || status.staged.includes(resolvedFilepath);
-        } catch {}
+        }
+        catch {}
 
         // Hash the file contents
         let hash = "";
         try {
             hash = md5(resolvedFilepath);
-        } catch {}
+        }
+        catch {}
 
         return {
             file: asFileRef(resolvedFilepath),
             isGitRepo: true,
             lastCommit,
             isDirty,
-            hash
+            hash,
         } satisfies GitFileInfo;
     }
-    
+
     // Not a git repo, return minimal info
     return {
         file: asFileRef(resolvedFilepath),
         isGitRepo: false,
         lastCommit: undefined,
         isDirty: false,
-        hash: ""
+        hash: "",
     } satisfies GitFileInfo;
 }

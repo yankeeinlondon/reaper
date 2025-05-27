@@ -1,4 +1,4 @@
-import { Symbol, SymbolFlags, ts } from "ts-morph";
+import type { Symbol, ts } from "ts-morph";
 
 /**
  * Boolean check as to whether the given Symbol has _at least_
@@ -6,5 +6,5 @@ import { Symbol, SymbolFlags, ts } from "ts-morph";
  */
 export function hasSomeSymbolFlags(symbol: Symbol, ...find: ts.SymbolFlags[]) {
     const flags = symbol.getFlags();
-    return find.some(f => (flags & f) == f)
+    return find.some(f => (flags & f) == f);
 }

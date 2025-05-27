@@ -1,15 +1,15 @@
-import { Symbol, TypeChecker } from "ts-morph";
-import { FunctionParameter, FnVariant } from "~/types";
-import {  } from "~/types";
+import type { Symbol, TypeChecker } from "ts-morph";
+import type { FnVariant, FunctionParameter } from "~/types";
 import { isFunctionVariant } from "~/type-guards";
 
 export function getFunctionParameters(
     sym: Symbol,
-    options?: { fnVariant?: FnVariant | false; checker?: TypeChecker }
+    options?: { fnVariant?: FnVariant | false; checker?: TypeChecker },
 ): FunctionParameter[] {
     const type = options?.fnVariant || isFunctionVariant(sym);
     const decl = sym.getDeclarations()[0];
-    if (!decl) return [];
+    if (!decl)
+        return [];
     const checker = options?.checker;
 
     // Helper to extract parameters from a callable signature
@@ -22,7 +22,7 @@ export function getFunctionParameters(
                 type: paramType ? checker ? checker.getTypeText(paramType) : "unknown" : "unknown",
                 optional: !!(paramDecl && (paramDecl as any).isOptional && (paramDecl as any).isOptional()),
                 defaultValue: paramDecl && (paramDecl as any).getInitializer ? (paramDecl as any).getInitializer()?.getText() : undefined,
-                jsDocs: []
+                jsDocs: [],
             };
         });
     }

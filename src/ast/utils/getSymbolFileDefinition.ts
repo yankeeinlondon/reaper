@@ -1,25 +1,25 @@
-import { relative } from "path";
-import { cwd } from "process";
-import { Symbol } from "ts-morph";
+import type { Symbol } from "ts-morph";
+import { relative } from "node:path";
+import { cwd } from "node:process";
 
 /**
  * Returns a `filepath`, `startLine`, and `endLine` for the passed
  * in **ts-morph** `Symbol`.
  */
-export const getSymbolFileDefinition = (sym: Symbol): {
+export function getSymbolFileDefinition(sym: Symbol): {
     filepath: string;
     startLine: number;
     endLine: number;
-} => {
+} {
     // Try to get the first declaration of the symbol
     const decl = sym.getDeclarations()[0];
 
     if (!decl) {
-        // If no declarations are found, return undefined values
+    // If no declarations are found, return undefined values
         return {
             filepath: "",
             startLine: -1,
-            endLine: -1
+            endLine: -1,
         };
     }
 
@@ -32,6 +32,6 @@ export const getSymbolFileDefinition = (sym: Symbol): {
     return {
         filepath,
         startLine,
-        endLine
+        endLine,
     };
-};
+}
