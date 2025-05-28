@@ -3,7 +3,7 @@ import type { SymbolRef } from "./types/reference-types";
 import type { SymbolMeta } from "./types/SymbolMeta";
 import { cwd } from "node:process";
 import { isNumberLike } from "inferred-types";
-import { repoRoot } from "./utils";
+import { repoRoot } from "repo-root";
 
 export const CWD = cwd();
 /**

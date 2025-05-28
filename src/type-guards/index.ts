@@ -14,3 +14,5 @@ export * from "./isSourceFile";
 export * from "./isSymbol";
 export * from "./isSymbolMeta";
 export * from "./isSymbolRef";
+export * from "./isFileRef";
+export * from "./isNode";

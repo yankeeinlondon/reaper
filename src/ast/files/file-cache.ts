@@ -44,7 +44,7 @@ const FILES = new Map<FileRef, FileMeta>();
  * the `FileRef`.
  */
 export function extractFileRef(ref: FileRef) {
-    return join(getRoot, stripLeading(ref, FILE_REF_PREFIX));
+    return join(getRoot(), stripLeading(ref, FILE_REF_PREFIX));
 }
 
 /**

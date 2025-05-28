@@ -51,3 +51,8 @@ export const IoError = createKindError(
     "IOError",
     { library: "@yankeeinlondon/reaper" },
 );
+
+export const InvalidParameter = createKindError(
+    "InvalidParameter",
+    { library: "@yankeeinlondon/reaper" },
+)

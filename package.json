@@ -32,7 +32,7 @@
     "@antfu/eslint-config": "^4.13.2",
     "@type-challenges/utils": "^0.1.1",
     "@types/find-root": "^1.1.4",
-    "@types/node": "22",
+    "@types/node": "^22.15.24",
     "bumpp": "^10.1.1",
     "bun": "^1.2.14",
     "eslint": "^9.27.0",
@@ -47,13 +47,13 @@
     "yaml": "^2.8.0"
   },
   "dependencies": {
-    "@yankeeinlondon/is-monorepo": "1.0.0-alpha.1",
-    "@yankeeinlondon/kind-error": "^1.2.2",
-    "@yankeeinlondon/package-json": "1.0.0-alpha.1",
+    "@yankeeinlondon/is-monorepo": "1.0.0-beta.1",
+    "@yankeeinlondon/kind-error": "^1.3.2",
+    "@yankeeinlondon/package-json": "1.0.0-beta.2",
     "chalk": "^5.4.1",
     "fast-glob": "^3.3.3",
     "inferred-types": "^0.55.23",
-    "repo-root": "1.0.0-alpha.4",
+    "repo-root": "1.0.0-beta.2",
     "simple-git": "^3.27.0",
     "ts-morph": "^26.0.0"
   }

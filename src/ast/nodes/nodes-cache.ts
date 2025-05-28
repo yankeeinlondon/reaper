@@ -1,6 +1,7 @@
 import type { Node, Symbol } from "ts-morph";
 import { isSymbol } from "inferred-types";
-import { InvalidNodeRef } from "~/errors";
+import { InvalidNodeRef, InvalidParameter } from "~/errors";
+import { isNode } from "~/type-guards";
 
 const NODES = new WeakMap<Node, Symbol>();
 
@@ -29,9 +30,20 @@ export function addNode(
     node: Node,
     force: boolean = false,
 ): Symbol | undefined {
+    if (!isNode(node)) {
+        throw InvalidParameter(
+            `The 'node' parameter received a non-Node type in addNode()!`,
+            {
+                param: "node",
+                expected: "Node",
+                got: typeof node
+            }
+        )
+    }
     if (NODES.has(node) && !force) {
         return NODES.get(node);
     }
+    // add to cache if we can get symbol
     const sym = node.getSymbol();
     if (isSymbol(sym)) {
         NODES.set(node, sym);

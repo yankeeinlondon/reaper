@@ -2,13 +2,15 @@ import { endsWith, isString, stripTrailing } from "inferred-types";
 import { FileMeta, ReaperApi } from "~/types";
 import { getRoot } from "~/constants";
 import { join } from "path";
-import { isMonorepo, parsePackageJson } from "~/utils";
 import { InvalidConfig, MissingConfig } from "~/errors";
 import chalk from "chalk";
 import { existsSync } from "fs";
 import { Project } from "ts-morph";
 import { SimpleGit } from "simple-git";
 import { isObject } from "./type-guards";
+import { isMonorepo } from "@yankeeinlondon/is-monorepo";
+import { parsePackageJson} from "@yankeeinlondon/package-json"
+import { provideFilesApi } from "./api/provideFilesApi";
 
 let git: null |SimpleGit = null;
 
@@ -57,11 +59,7 @@ export function reaper(
             : undefined;
     const monorepo = isMonorepo();
 
-    if(monorepo && monorepo !== "maybe" && !filepath) {
-        throw InvalidConfig(`although starting reaper without an explict path to the configuration is allowed it will not work in a monorepo!`)
-    }
 
-    try {
         const configFile = configPath
             ? endsWith(".json") ? configPath : join(configPath, "tsconfig.json")
             : join(getRoot(), "tsconfig.json");
@@ -98,11 +96,6 @@ export function reaper(
             languageService,
             sourceFiles,
             features: []
-        } satisfies  ReaperApi<[]>;
-    } catch (err) {
-        throw isError(err)
-            ? Unexpected.proxy(err)
-            : Unexpected(String(err))
-    }
+        }) satisfies  ReaperApi<[]>;
 }
 

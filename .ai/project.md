@@ -21,6 +21,7 @@ You can think of the `ReaperApi` as a API surface which _composes_ all of the va
 - All test files should be put in the `./tests` directory and filenameing convention is to match the glob pattern of `tests/**/*.test.ts`
   - There should typically be a one-to-one relationship between a source file (or in some cases a source symbol defined in a source file) and a test file.
   - As we're building out the functionality there will be some test files missing but the goal is to have full coverage
+  - When being asked to modify or add test files always run the test after making changes and ensure that your changes had the impact you were expecting.
 
 ## Devops
 
